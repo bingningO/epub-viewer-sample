@@ -5,6 +5,7 @@ import androidx.compose.runtime.Stable
 import com.bing.epublib.ui.common.UIEvent
 import com.skytree.epub.SkyProvider
 import kotlinx.coroutines.flow.FlowCollector
+import kotlinx.coroutines.flow.StateFlow
 
 class SkyEpubViewerContract {
 
@@ -14,7 +15,7 @@ class SkyEpubViewerContract {
     }
 
     interface UiState {
-        val uiData: UiData
+        val uiData: StateFlow<UiData>
         val events: List<SkyEpubViewerEvent>
     }
 
