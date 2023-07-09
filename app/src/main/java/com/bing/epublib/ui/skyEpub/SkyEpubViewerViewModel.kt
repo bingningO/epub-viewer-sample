@@ -10,10 +10,9 @@ import com.bing.epublib.ui.skyEpub.SkyEpubViewerContract.UiInput
 import com.bing.epublib.ui.skyEpub.SkyEpubViewerContract.UiState
 import com.skytree.epub.SkyProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -24,42 +23,48 @@ class SkyEpubViewerViewModel @Inject constructor(
 ) : ViewModel(), SkyEpubViewerContract.ViewModel {
 
     private val eventHandler = UIEventHandler<SkyEpubViewerEvent>(viewModelScope)
-    private val _uiData = MutableStateFlow(UiData())
+    private val _uiData = SkyEpubViewerContract.MutableUiData()
     override val uiState: UiState = object : UiState {
-        override var uiData: StateFlow<UiData> = _uiData.asStateFlow()
+        override var uiData: UiData = _uiData
         override val events: List<SkyEpubViewerEvent> = eventHandler.eventState
     }
 
+    private val _onLoadingStateChanged = MutableSharedFlow<Boolean>()
+
     override val uiInput: UiInput = object : UiInput {
         override val onEventConsumed = eventHandler.onEventConsumed
+        override val onLoadingStateChanged = _onLoadingStateChanged
     }
 
     // todo make the books can be selected at the screen
-    private val bookName = "sample1.epub"
+    private val bookName = "Alice.epub"
 
     init {
+        startObserveUiInput()
+
         viewModelScope.launch {
             prepareData()
         }
     }
 
     private suspend fun prepareData() {
-        _uiData.update { it.copy(isLoading = true) }
-        Timber.v("epub start ${_uiData.value.isLoading}")
+        _uiData.isInitLoading = true
         try {
             epubFileReader.prepareBook(bookName)
         } catch (e: Throwable) {
-            _uiData.update { it.copy(error = e) }
+            _uiData.error = e
         } finally {
-            _uiData.update {
-                it.copy(
-                    isLoading = false,
-                    bookProvider = SkyProvider(),
-                    bookPath = epubFileReader.getBookPath(bookName)
-                )
-            }
-            Timber.v("epub end ${_uiData.value.isLoading}, path: ${_uiData.value.bookPath}")
+            _uiData.isInitLoading = false
+            _uiData.bookProvider = SkyProvider()
+            _uiData.bookPath = epubFileReader.getBookPath(bookName)
         }
+    }
+
+    private fun startObserveUiInput() {
+        _onLoadingStateChanged.onEach { isLoading ->
+            Timber.v("epub onLoadingStateChanged $isLoading")
+            _uiData.isAnalysisLoading = isLoading
+        }.launchIn(viewModelScope)
     }
 
 }

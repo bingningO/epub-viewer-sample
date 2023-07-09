@@ -2,10 +2,12 @@ package com.bing.epublib.ui.skyEpub
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import com.bing.epublib.ui.common.UIEvent
 import com.skytree.epub.SkyProvider
 import kotlinx.coroutines.flow.FlowCollector
-import kotlinx.coroutines.flow.StateFlow
 
 class SkyEpubViewerContract {
 
@@ -15,21 +17,31 @@ class SkyEpubViewerContract {
     }
 
     interface UiState {
-        val uiData: StateFlow<UiData>
+        val uiData: UiData
         val events: List<SkyEpubViewerEvent>
     }
 
     interface UiInput {
         val onEventConsumed: FlowCollector<SkyEpubViewerEvent>
+        val onLoadingStateChanged: FlowCollector<Boolean>
     }
 
     @Stable
-    data class UiData(
-        val isLoading: Boolean = true,
-        val error: Throwable? = null,
-        val bookProvider: SkyProvider? = null,
-        val bookPath: String = ""
-    )
+    interface UiData {
+        val isInitLoading: Boolean
+        val isAnalysisLoading: Boolean
+        val error: Throwable?
+        val bookProvider: SkyProvider?
+        val bookPath: String
+    }
+
+    internal class MutableUiData() : UiData {
+        override var isAnalysisLoading: Boolean by mutableStateOf(false)
+        override var isInitLoading: Boolean by mutableStateOf(false)
+        override var error: Throwable? by mutableStateOf(null)
+        override var bookPath: String by mutableStateOf("")
+        override var bookProvider: SkyProvider? by mutableStateOf(null)
+    }
 
     @Immutable
     sealed class SkyEpubViewerEvent : UIEvent() {
