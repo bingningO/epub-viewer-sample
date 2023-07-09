@@ -1,6 +1,5 @@
 package com.bing.epublib.ui.common.composable
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
@@ -17,8 +16,7 @@ import com.bing.epublib.ui.theme.EpubLibTheme
 fun LoadingScreen() {
     Box(
         modifier = Modifier
-            .fillMaxSize()
-            .background(color = MaterialTheme.colorScheme.background),
+            .fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
         CircularProgressIndicator(

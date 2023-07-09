@@ -31,16 +31,19 @@ class SkyEpubViewerContract {
         val isInitLoading: Boolean
         val isAnalysisLoading: Boolean
         val error: Throwable?
-        val bookProvider: SkyProvider?
+        val bookProvider: StableBookProvider?
         val bookPath: String
     }
+
+    @Stable
+    class StableBookProvider : SkyProvider()
 
     internal class MutableUiData() : UiData {
         override var isAnalysisLoading: Boolean by mutableStateOf(false)
         override var isInitLoading: Boolean by mutableStateOf(false)
         override var error: Throwable? by mutableStateOf(null)
         override var bookPath: String by mutableStateOf("")
-        override var bookProvider: SkyProvider? by mutableStateOf(null)
+        override var bookProvider: StableBookProvider? by mutableStateOf(null)
     }
 
     @Immutable

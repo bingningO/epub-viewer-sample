@@ -5,10 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.bing.epublib.epubDomain.EpubFileReader
 import com.bing.epublib.ui.common.UIEventHandler
 import com.bing.epublib.ui.skyEpub.SkyEpubViewerContract.SkyEpubViewerEvent
+import com.bing.epublib.ui.skyEpub.SkyEpubViewerContract.StableBookProvider
 import com.bing.epublib.ui.skyEpub.SkyEpubViewerContract.UiData
 import com.bing.epublib.ui.skyEpub.SkyEpubViewerContract.UiInput
 import com.bing.epublib.ui.skyEpub.SkyEpubViewerContract.UiState
-import com.skytree.epub.SkyProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.launchIn
@@ -25,7 +25,7 @@ class SkyEpubViewerViewModel @Inject constructor(
     private val eventHandler = UIEventHandler<SkyEpubViewerEvent>(viewModelScope)
     private val _uiData = SkyEpubViewerContract.MutableUiData()
     override val uiState: UiState = object : UiState {
-        override var uiData: UiData = _uiData
+        override val uiData: UiData = _uiData
         override val events: List<SkyEpubViewerEvent> = eventHandler.eventState
     }
 
@@ -52,10 +52,11 @@ class SkyEpubViewerViewModel @Inject constructor(
         try {
             epubFileReader.prepareBook(bookName)
         } catch (e: Throwable) {
+            Timber.e(e, "epub prepare book error")
             _uiData.error = e
         } finally {
             _uiData.isInitLoading = false
-            _uiData.bookProvider = SkyProvider()
+            _uiData.bookProvider = StableBookProvider()
             _uiData.bookPath = epubFileReader.getBookPath(bookName)
         }
     }

@@ -1,5 +1,6 @@
 package com.bing.epublib.ui.skyEpub
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -12,10 +13,10 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.bing.epublib.ui.common.composable.ErrorScreen
 import com.bing.epublib.ui.common.composable.LoadingScreen
+import com.bing.epublib.ui.common.composable.SystemBarVisibilityController
 import com.bing.epublib.ui.skyEpub.SkyEpubViewerContract.UiData
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -23,7 +24,8 @@ import java.lang.ref.WeakReference
 
 @Composable
 fun SkyEpubViewerScreen(
-    viewModel: SkyEpubViewerContract.ViewModel = hiltViewModel<SkyEpubViewerViewModel>()
+    viewModel: SkyEpubViewerContract.ViewModel = hiltViewModel<SkyEpubViewerViewModel>(),
+    systemBarVisibilityController: SystemBarVisibilityController
 ) {
     val uiState = viewModel.uiState
     val uiInput = viewModel.uiInput
@@ -36,15 +38,22 @@ fun SkyEpubViewerScreen(
     }
     SkyEpubViewerContent(
         uiData = uiState.uiData,
-        uiInput = uiInput
+        uiInput = uiInput,
+        systemBarVisibilityController = systemBarVisibilityController
     )
 }
 
 @Composable
 private fun SkyEpubViewerContent(
     uiData: UiData,
-    uiInput: SkyEpubViewerContract.UiInput
+    uiInput: SkyEpubViewerContract.UiInput,
+    systemBarVisibilityController: SystemBarVisibilityController
 ) {
+    Timber.v("epub log SkyEpubViewerContent")
+    LaunchedEffect(Unit) {
+        systemBarVisibilityController.setVisibility(false)
+    }
+
     when {
         uiData.isInitLoading -> {
             // loading for preparing book data
@@ -73,6 +82,7 @@ private fun SkyEpubViewerContent(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun SkyEpubViewerSuccessContent(
     uiData: UiData,
@@ -95,23 +105,26 @@ private fun SkyEpubViewer(
     uiData: UiData,
     onLoadingStateChange: (Boolean) -> Unit
 ) {
+    val scope = rememberCoroutineScope()
     var viewerRef by remember {
         mutableStateOf(WeakReference<SkyEpubCustomViewer>(null))
     }
-    var bookFilePath: String? by remember { mutableStateOf(null) }
+    var bookFilePath: String by remember { mutableStateOf("") }
     val currentOnLoadingStateChange by rememberUpdatedState(onLoadingStateChange)
 
     AndroidView(
         modifier = modifier,
         factory = { factoryContext ->
+            // todo keep called when rotate screen, but inspector says it's not(skipped)
             Timber.v("epub log viewer factory")
             SkyEpubCustomViewer(factoryContext).apply {
                 viewerRef = WeakReference(this)
+                // init
+                setBookPath(uiData.bookPath)
+                setContentProvider(uiData.bookProvider)
+                setStartPositionInBook(0f)
 
-                layoutParams = ConstraintLayout.LayoutParams(
-                    ConstraintLayout.LayoutParams.MATCH_PARENT,
-                    ConstraintLayout.LayoutParams.MATCH_PARENT
-                )
+                // setListener
                 setLoadingListener {
                     currentOnLoadingStateChange.invoke(it)
                 }
@@ -119,14 +132,6 @@ private fun SkyEpubViewer(
         },
         update = { view ->
             Timber.v("epub log viewer update")
-            // might need if below 
-            if (bookFilePath != uiData.bookPath) {
-                bookFilePath = uiData.bookPath
-                view.setBookPath(uiData.bookPath)
-                view.isRotationLocked = true
-                view.setStartPositionInBook(0f)
-                view.setContentProvider(uiData.bookProvider)
-            }
         }
     )
 

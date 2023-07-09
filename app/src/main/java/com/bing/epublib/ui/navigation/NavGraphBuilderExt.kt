@@ -3,10 +3,13 @@ package com.bing.epublib.ui.navigation
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import com.bing.epublib.ui.common.composable.SystemBarVisibilityController
 import com.bing.epublib.ui.home.HomeScreen
 import com.bing.epublib.ui.skyEpub.SkyEpubViewerScreen
 
-fun NavGraphBuilder.addHomeTopLevel(navController: NavController) {
+fun NavGraphBuilder.addHomeTopLevel(
+    navController: NavController
+) {
     composable(ScreenRoutes.Home.route) {
         HomeScreen(
             onNavigateToSkyEpubViewer = {
@@ -16,8 +19,11 @@ fun NavGraphBuilder.addHomeTopLevel(navController: NavController) {
     }
 }
 
-fun NavGraphBuilder.addSkyEpubViewerTopLevel(navController: NavController) {
+fun NavGraphBuilder.addSkyEpubViewerTopLevel(
+    navController: NavController,
+    systemBarVisibilityController: SystemBarVisibilityController
+) {
     composable(ScreenRoutes.SkyEpubViewer.route) {
-        SkyEpubViewerScreen()
+        SkyEpubViewerScreen(systemBarVisibilityController = systemBarVisibilityController)
     }
 }
