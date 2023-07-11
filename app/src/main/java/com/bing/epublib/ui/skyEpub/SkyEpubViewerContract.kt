@@ -23,14 +23,12 @@ class SkyEpubViewerContract {
 
     interface UiInput {
         val onEventConsumed: FlowCollector<SkyEpubViewerEvent>
-        val onScanLoadingChanged: FlowCollector<Boolean>
         val onLoadingStateChanged: FlowCollector<Boolean>
     }
 
     @Stable
     interface UiData {
-        val isInitLoading: Boolean
-        val isAnalysisLoading: Boolean
+        val isLoading: Boolean
         val error: Throwable?
         val bookProvider: StableBookProvider?
         val bookPath: String
@@ -60,8 +58,7 @@ class SkyEpubViewerContract {
     class StableBookProvider : SkyProvider()
 
     internal class MutableUiData() : UiData {
-        override var isAnalysisLoading: Boolean by mutableStateOf(false)
-        override var isInitLoading: Boolean by mutableStateOf(false)
+        override var isLoading: Boolean by mutableStateOf(false)
         override var error: Throwable? by mutableStateOf(null)
         override var bookPath: String by mutableStateOf("")
         override var bookProvider: StableBookProvider? by mutableStateOf(null)

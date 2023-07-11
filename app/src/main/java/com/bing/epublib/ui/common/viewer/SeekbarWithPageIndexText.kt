@@ -32,7 +32,7 @@ internal fun ViewerControllerSeekbarWithPageIndexText(
     }
     val maxIndex by remember(totalPage) {
         derivedStateOf {
-            (totalPage.toFloat() - 1).coerceAtLeast(1f)
+            (totalPage.toFloat() - 1)
         }
     }
 
@@ -40,10 +40,11 @@ internal fun ViewerControllerSeekbarWithPageIndexText(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
+        val displayMax = if (maxIndex > 0) "${maxIndex.toInt()}" else "..."
         Text(
             modifier = Modifier.width(80.dp),
             textAlign = TextAlign.Center,
-            text = "${displayProgress.toInt()} / ${maxIndex.toInt()}",
+            text = "${displayProgress.toInt()} / $displayMax",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.secondary,
         )
@@ -53,7 +54,7 @@ internal fun ViewerControllerSeekbarWithPageIndexText(
             onValueChange = { progress ->
                 displayProgress = progress
             },
-            valueRange = 0f..maxIndex,
+            valueRange = 0f..if (maxIndex > 0) maxIndex else 100f,
             onValueChangeFinished = {
                 onChangeSeekbarProgressFinish.invoke(displayProgress.toInt())
             },

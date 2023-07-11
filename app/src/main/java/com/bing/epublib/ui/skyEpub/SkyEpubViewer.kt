@@ -22,7 +22,6 @@ internal fun SkyEpubViewer(
     modifier: Modifier = Modifier,
     uiData: SkyEpubViewerContract.UiData,
     onLoadingStateChange: (Boolean) -> Unit,
-    onScanningStateChange: (Boolean) -> Unit,
     onTap: () -> Unit,
     onGetTotalPages: (Int) -> Unit,
     onPageChanged: (BookPagingInfo) -> Unit,
@@ -34,7 +33,6 @@ internal fun SkyEpubViewer(
         mutableStateOf(WeakReference<SkyEpubReflowableViewer>(null))
     }
     val currentOnLoadingStateChange by rememberUpdatedState(onLoadingStateChange)
-    val currentOnScanningStateChange by rememberUpdatedState(onScanningStateChange)
     val currentOnRequestPageFinished by rememberUpdatedState(onRequestJumpFinished)
     val currentOnTap by rememberUpdatedState(newValue = onTap)
     val currentOnPageChanged by rememberUpdatedState(newValue = onPageChanged)
@@ -78,7 +76,6 @@ internal fun SkyEpubViewer(
         factory = { factoryContext ->
             Timber.v("epub log viewer factory")
             SkyEpubReflowableViewer(factoryContext).apply {
-                currentOnScanningStateChange.invoke(true)
                 viewerRef = WeakReference(this)
 
                 // init
@@ -89,7 +86,6 @@ internal fun SkyEpubViewer(
                 // setListener, must call this to get totalPages by analysis global pagingInfo
                 setScanListener { max ->
                     currentOnGetTotalPagesChanged.invoke(max)
-                    currentOnScanningStateChange.invoke(false)
                 }
                 setLoadingListener {
                     currentOnLoadingStateChange.invoke(it)

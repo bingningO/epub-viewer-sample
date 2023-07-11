@@ -24,7 +24,6 @@ import com.bing.epublib.ui.common.composable.LoadingScreen
 import com.bing.epublib.ui.common.viewer.SeekBarContent
 import com.bing.epublib.ui.skyEpub.SkyEpubViewerContract.UiData
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @Composable
 fun SkyEpubViewerScreen(
@@ -50,13 +49,11 @@ private fun SkyEpubViewerContent(
     uiData: UiData,
     uiInput: SkyEpubViewerContract.UiInput,
 ) {
-    Timber.v("epub log SkyEpubViewerContent")
-
     when {
-        uiData.isInitLoading -> {
-            // loading for preparing book data
-            LoadingScreen()
-        }
+//        uiData.isInitLoading -> {
+//            // loading for preparing book data
+//            LoadingScreen()
+//        }
 
         uiData.error != null -> {
             ErrorScreen(error = uiData.error!!)
@@ -66,13 +63,13 @@ private fun SkyEpubViewerContent(
             Surface(
                 modifier = Modifier.fillMaxSize()
             ) {
-                SkyEpubViewerSuccessContent(
-                    uiData = uiData,
-                    uiInput = uiInput
-                )
-
-                // loading when SDK is analysis, todo want to show cover and progress line bar
-                if (uiData.isAnalysisLoading) {
+                if (uiData.bookProvider != null) {
+                    SkyEpubViewerSuccessContent(
+                        uiData = uiData, uiInput = uiInput
+                    )
+                }
+                
+                if (uiData.isLoading) {
                     LoadingScreen()
                 }
             }
@@ -99,9 +96,6 @@ private fun SkyEpubViewerSuccessContent(
             onLoadingStateChange = {
                 scope.launch { uiInput.onLoadingStateChanged.emit(it) }
             },
-            onScanningStateChange = {
-                scope.launch { uiInput.onScanLoadingChanged.emit(it) }
-            },
             requestJumpGlobalIndexProgress = progressChangeRequestByController,
             onTap = {
                 isShowController = true
@@ -125,17 +119,13 @@ private fun SkyEpubViewerSuccessContent(
         exit = fadeOut()
     ) {
 
-        if (maxIndexFromViewerSDK != 0) {
-            SeekBarContent(
-                currentIndex = currentGlobalIndexFromViewerSDK,
-                totalPage = maxIndexFromViewerSDK,
-                onChangeSeekbarProgressFinish = {
-                    progressChangeRequestByController = it
-                },
-                onClick = {
-                    isShowController = false
-                }
-            )
-        }
+        SeekBarContent(currentIndex = currentGlobalIndexFromViewerSDK,
+            totalPage = maxIndexFromViewerSDK,
+            onChangeSeekbarProgressFinish = {
+                progressChangeRequestByController = it
+            },
+            onClick = {
+                isShowController = false
+            })
     }
 }

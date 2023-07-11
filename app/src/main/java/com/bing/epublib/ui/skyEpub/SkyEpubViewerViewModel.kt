@@ -14,8 +14,6 @@ import com.bing.epublib.ui.skyEpub.SkyEpubViewerContract.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -35,16 +33,15 @@ class SkyEpubViewerViewModel @Inject constructor(
     }
 
     private val _onLoadingStateChanged = MutableSharedFlow<Boolean>()
-    private val _onScanLoadingChanged = MutableSharedFlow<Boolean>()
 
     override val uiInput: UiInput = object : UiInput {
         override val onEventConsumed = eventHandler.onEventConsumed
         override val onLoadingStateChanged = _onLoadingStateChanged
-        override val onScanLoadingChanged = _onScanLoadingChanged
     }
 
     // todo make the books can be selected at the screen
     private val bookName = "Alice.epub"
+    private var isPreparingData = true
 
     init {
         startObserveUiInput()
@@ -55,33 +52,22 @@ class SkyEpubViewerViewModel @Inject constructor(
     }
 
     private suspend fun prepareData() {
-        _uiData.isInitLoading = true
+        isPreparingData = true
         try {
             epubFileReader.prepareBook(bookName)
         } catch (e: Throwable) {
             Timber.e(e, "epub prepare book error")
             _uiData.error = e
         } finally {
-            _uiData.isInitLoading = false
+            isPreparingData = false
             _uiData.bookProvider = StableBookProvider()
             _uiData.bookPath = epubFileReader.getBookPath(bookName)
         }
     }
 
     private fun startObserveUiInput() {
-        _onScanLoadingChanged.combine(
-            _onLoadingStateChanged
-        ) { isScanning, isLoading -> isScanning || isLoading }
-            .debounce(200)
-            .onEach { isScanningOrLoading ->
-                Timber.v("epub onScanLoadingChanged $isScanningOrLoading")
-                _uiData.isAnalysisLoading = isScanningOrLoading
-            }.launchIn(viewModelScope)
-
+        _onLoadingStateChanged.onEach { isLoading ->
+            _uiData.isLoading = isLoading || isPreparingData
+        }.launchIn(viewModelScope)
     }
-//        _onLoadingStateChanged.onEach { isLoading ->
-//            Timber.v("epub onLoadingStateChanged $isLoading")
-//            _uiData.isAnalysisLoading = isLoading
-//        }.launchIn(viewModelScope)
-
 }
