@@ -33,7 +33,16 @@ class SkyEpubViewerContract {
         val error: Throwable?
         val bookProvider: StableBookProvider?
         val bookPath: String
+        val bookMetaData: BookMetaData?
     }
+
+    @Stable
+    data class BookMetaData(
+        val title: String,
+        val isFixedLayout: Boolean,
+        val description: String,
+        val orientation: Int
+    )
 
     @Stable
     class StableBookProvider : SkyProvider()
@@ -44,6 +53,7 @@ class SkyEpubViewerContract {
         override var error: Throwable? by mutableStateOf(null)
         override var bookPath: String by mutableStateOf("")
         override var bookProvider: StableBookProvider? by mutableStateOf(null)
+        override var bookMetaData: BookMetaData? by mutableStateOf(null)
     }
 
     @Immutable
