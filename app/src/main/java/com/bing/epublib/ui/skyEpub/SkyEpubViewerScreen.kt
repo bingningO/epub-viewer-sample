@@ -87,9 +87,13 @@ private fun SkyEpubViewerSuccessContent(
 ) {
     val scope = rememberCoroutineScope()
     var isShowController by remember { mutableStateOf(false) }
-    var currentIndexFromViewerSDK by remember { mutableStateOf(0) }
+    var currentPagingInfoFromViewerSDK: SkyEpubViewerContract.BookPagingInfo? by remember {
+        mutableStateOf(
+            null
+        )
+    }
     var maxIndexFromViewerSDK by remember { mutableStateOf(0) }
-    var progressChangeRequestByController: Float? by remember { mutableStateOf(null) }
+    var progressChangeRequestByController: Int? by remember { mutableStateOf(null) }
 
     CompositionLocalProvider(
         LocalOverscrollConfiguration provides null,
@@ -99,13 +103,12 @@ private fun SkyEpubViewerSuccessContent(
             onLoadingStateChange = {
                 scope.launch { uiInput.onLoadingStateChanged.emit(it) }
             },
-            requestJumpProgress = progressChangeRequestByController,
+            requestJumpGlobalIndexProgress = progressChangeRequestByController,
             onTap = {
                 isShowController = true
             },
-            onPageChanged = { current, max ->
-                currentIndexFromViewerSDK = current
-                maxIndexFromViewerSDK = max
+            onPageChanged = {
+                currentPagingInfoFromViewerSDK = it
             },
             onGetMaxIndex = {
                 Timber.v("epub log onGetMaxIndex $it")
@@ -123,15 +126,16 @@ private fun SkyEpubViewerSuccessContent(
         exit = fadeOut()
     ) {
 
-        SeekBarContent(
-            currentIndex = currentIndexFromViewerSDK,
-            maxIndex = maxIndexFromViewerSDK,
-            onChangeSeekbarProgressFinish = {
-                progressChangeRequestByController = it
-            },
-            onClick = {
-                isShowController = false
-            }
-        )
+        currentPagingInfoFromViewerSDK?.let { info ->
+            SeekBarContent(
+                pagingInfo = info,
+                onChangeSeekbarProgressFinish = {
+                    progressChangeRequestByController = it
+                },
+                onClick = {
+                    isShowController = false
+                }
+            )
+        }
     }
 }

@@ -8,6 +8,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
+import com.bing.epublib.ui.skyEpub.SkyEpubViewerContract.BookPagingInfo
 import timber.log.Timber
 import java.lang.ref.WeakReference
 
@@ -18,8 +19,8 @@ internal fun SkyEpubViewer(
     onLoadingStateChange: (Boolean) -> Unit,
     onTap: () -> Unit,
     onGetMaxIndex: (Int) -> Unit,
-    onPageChanged: (current: Int, max: Int) -> Unit,
-    requestJumpProgress: Float?,
+    onPageChanged: (BookPagingInfo) -> Unit,
+    requestJumpGlobalIndexProgress: Int?,
     onRequestJumpFinished: () -> Unit
 ) {
     var viewerRef by remember {
@@ -29,7 +30,6 @@ internal fun SkyEpubViewer(
     val currentOnRequestPageFinished by rememberUpdatedState(onRequestJumpFinished)
     val currentOnTap by rememberUpdatedState(newValue = onTap)
     val currentOnPageChanged by rememberUpdatedState(newValue = onPageChanged)
-    // todo SDK#numberOfPagesInBook always get 0 currently, try to analysis book xml file
     var maxIndex by remember { mutableStateOf(0) }
 
     AndroidView(
@@ -44,17 +44,18 @@ internal fun SkyEpubViewer(
                 setContentProvider(uiData.bookProvider)
                 setStartPositionInBook(0f)
 
-                // setListener
-                setTotalPagesListener {
-                    maxIndex = (it - 1).coerceAtLeast(0)
+                // setListener, must call this to get totalPages by analysis global pagingInfo
+                setPagingListener { max ->
+                    maxIndex = (max - 1).coerceAtLeast(0)
                     onGetMaxIndex.invoke(maxIndex)
                 }
+                
                 setLoadingListener {
                     currentOnLoadingStateChange.invoke(it)
                 }
-                setOnPageMovedListener { current, max ->
-                    maxIndex = max.coerceAtLeast(0)
-                    currentOnPageChanged.invoke(current, maxIndex)
+                setOnPageMovedListener { info ->
+                    maxIndex = info.totalPage
+                    currentOnPageChanged.invoke(info)
                 }
                 setOnScreenClicked {
                     currentOnTap.invoke()
@@ -64,13 +65,13 @@ internal fun SkyEpubViewer(
         },
         update = { view ->
             Timber.v("epub log viewer update")
-            requestJumpProgress?.let {
+            requestJumpGlobalIndexProgress?.let {
                 if (view.isPaging.not()) {
-                    val ppb = it / maxIndex.toDouble()
+                    val ppb = view.getPagePositionInBookByPageIndexInBook(it)
                     // So absolute position in epub is expressed as pagePositionInBook.
                     // This is float value from 0.0f to 1.0f for entire book.
                     view.gotoPageByPagePositionInBook(ppb)
-                    
+
                     currentOnRequestPageFinished.invoke()
                 }
             }

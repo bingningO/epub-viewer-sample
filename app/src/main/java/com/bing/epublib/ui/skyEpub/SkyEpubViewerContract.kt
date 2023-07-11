@@ -45,6 +45,17 @@ class SkyEpubViewerContract {
     )
 
     @Stable
+    data class BookPagingInfo(
+        // todo for SDK problem could not get the correct total page
+        val totalPage: Int = 0,
+        val totalPageInChapter: Int,
+        val currentIndexInChapter: Int,
+        val currentIndexInBook: Int,
+        val currentChapterIndex: Int,
+        val totalNumberOfChapters: Int
+    )
+
+    @Stable
     class StableBookProvider : SkyProvider()
 
     internal class MutableUiData() : UiData {
