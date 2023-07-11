@@ -28,6 +28,9 @@ class SkyEpubReflowableViewer(context: Context) : ReflowableControl(context) {
         setForegroundColor(Color.White.toArgb())
         setBackgroundColor(Color.Gray.toArgb())
         setPageTransition(PageTransition.Curl)
+        setDoublePagedForLandscape(true)
+        setSwipeEnabled(true)
+        adjustContentWidth(true)
         // set the bookCode to identify the book file.
         setBookCode(BOOK_CODE)
 
