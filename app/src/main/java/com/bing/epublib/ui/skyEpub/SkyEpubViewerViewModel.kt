@@ -7,10 +7,10 @@ import androidx.lifecycle.viewModelScope
 import com.bing.epublib.epubDomain.EpubFileReader
 import com.bing.epublib.ui.common.UIEventHandler
 import com.bing.epublib.ui.skyEpub.SkyEpubViewerContract.SkyEpubViewerEvent
-import com.bing.epublib.ui.skyEpub.SkyEpubViewerContract.StableBookProvider
 import com.bing.epublib.ui.skyEpub.SkyEpubViewerContract.UiData
 import com.bing.epublib.ui.skyEpub.SkyEpubViewerContract.UiInput
 import com.bing.epublib.ui.skyEpub.SkyEpubViewerContract.UiState
+import com.skytree.epub.SkyProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -60,7 +60,7 @@ class SkyEpubViewerViewModel @Inject constructor(
             _uiData.error = e
         } finally {
             isPreparingData = false
-            _uiData.bookProvider = StableBookProvider()
+            _uiData.bookProvider = SkyProvider()
             _uiData.bookPath = epubFileReader.getBookPath(bookName)
         }
     }

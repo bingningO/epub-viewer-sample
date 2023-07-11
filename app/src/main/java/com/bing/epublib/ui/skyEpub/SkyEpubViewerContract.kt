@@ -30,9 +30,10 @@ class SkyEpubViewerContract {
     interface UiData {
         val isLoading: Boolean
         val error: Throwable?
-        val bookProvider: StableBookProvider?
+        val bookProvider: SkyProvider?
         val bookPath: String
         val bookMetaData: BookMetaData?
+        val isFixedLayout: Boolean
     }
 
     @Stable
@@ -45,8 +46,7 @@ class SkyEpubViewerContract {
 
     @Stable
     data class BookPagingInfo(
-        // todo for SDK problem could not get the correct total page
-        val totalPage: Int = 0,
+        val totalPage: Int,
         val totalPageInChapter: Int,
         val currentIndexInChapter: Int,
         val currentIndexInBook: Int,
@@ -54,15 +54,13 @@ class SkyEpubViewerContract {
         val totalNumberOfChapters: Int
     )
 
-    @Stable
-    class StableBookProvider : SkyProvider()
-
     internal class MutableUiData() : UiData {
         override var isLoading: Boolean by mutableStateOf(false)
         override var error: Throwable? by mutableStateOf(null)
         override var bookPath: String by mutableStateOf("")
-        override var bookProvider: StableBookProvider? by mutableStateOf(null)
+        override var bookProvider: SkyProvider? by mutableStateOf(null)
         override var bookMetaData: BookMetaData? by mutableStateOf(null)
+        override var isFixedLayout: Boolean by mutableStateOf(false)
     }
 
     @Immutable

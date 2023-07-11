@@ -17,6 +17,7 @@ import com.skytree.epub.SkyActivityState
 import timber.log.Timber
 import java.lang.ref.WeakReference
 
+// todo need separate reflowable and fixed viewer
 @Composable
 internal fun SkyEpubViewer(
     modifier: Modifier = Modifier,
