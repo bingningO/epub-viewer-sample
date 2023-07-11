@@ -87,12 +87,8 @@ private fun SkyEpubViewerSuccessContent(
 ) {
     val scope = rememberCoroutineScope()
     var isShowController by remember { mutableStateOf(false) }
-    var currentPagingInfoFromViewerSDK: SkyEpubViewerContract.BookPagingInfo? by remember {
-        mutableStateOf(
-            null
-        )
-    }
     var maxIndexFromViewerSDK by remember { mutableStateOf(0) }
+    var currentGlobalIndexFromViewerSDK by remember { mutableStateOf(0) }
     var progressChangeRequestByController: Int? by remember { mutableStateOf(null) }
 
     CompositionLocalProvider(
@@ -103,15 +99,18 @@ private fun SkyEpubViewerSuccessContent(
             onLoadingStateChange = {
                 scope.launch { uiInput.onLoadingStateChanged.emit(it) }
             },
+            onScanningStateChange = {
+                scope.launch { uiInput.onScanLoadingChanged.emit(it) }
+            },
             requestJumpGlobalIndexProgress = progressChangeRequestByController,
             onTap = {
                 isShowController = true
             },
             onPageChanged = {
-                currentPagingInfoFromViewerSDK = it
+                maxIndexFromViewerSDK = it.totalPage
+                currentGlobalIndexFromViewerSDK = it.currentIndexInBook
             },
-            onGetMaxIndex = {
-                Timber.v("epub log onGetMaxIndex $it")
+            onGetTotalPages = {
                 maxIndexFromViewerSDK = it
             },
             onRequestJumpFinished = {
@@ -126,9 +125,10 @@ private fun SkyEpubViewerSuccessContent(
         exit = fadeOut()
     ) {
 
-        currentPagingInfoFromViewerSDK?.let { info ->
+        if (maxIndexFromViewerSDK != 0) {
             SeekBarContent(
-                pagingInfo = info,
+                currentIndex = currentGlobalIndexFromViewerSDK,
+                totalPage = maxIndexFromViewerSDK,
                 onChangeSeekbarProgressFinish = {
                     progressChangeRequestByController = it
                 },

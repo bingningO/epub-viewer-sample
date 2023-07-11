@@ -51,9 +51,7 @@ class SkyEpubReflowableViewer(context: Context) : ReflowableControl(context) {
     }
 
     fun setLoadingListener(listener: (isLoading: Boolean) -> Unit) {
-        Timber.v("epub log setLoadingListner init")
         setStateListener { state ->
-            Timber.v("epub log state: $state")
             val isLoading = when (state) {
                 State.LOADING, State.BUSY -> true
                 else -> false
@@ -70,16 +68,18 @@ class SkyEpubReflowableViewer(context: Context) : ReflowableControl(context) {
 
             override fun onPageMoved(pi: PageInformation?) {
                 // be notice [totalPage] is changed during pagination
-                listener.invoke(
-                    BookPagingInfo(
-                        totalPageInChapter = pi?.numberOfPagesInChapter ?: 0,
-                        currentIndexInChapter = pi?.pageIndex ?: 0,
-                        currentIndexInBook = pi?.pageIndexInBook ?: 0,
-                        currentChapterIndex = pi?.chapterIndex ?: 0,
-                        totalNumberOfChapters = pi?.numberOfChaptersInBook ?: 0,
-                        totalPage = pi?.numberOfPagesInBook ?: 0
+                if (isPaging.not()) {
+                    listener.invoke(
+                        BookPagingInfo(
+                            totalPageInChapter = pi?.numberOfPagesInChapter ?: 0,
+                            currentIndexInChapter = pi?.pageIndex ?: 0,
+                            currentIndexInBook = pi?.pageIndexInBook ?: 0,
+                            currentChapterIndex = pi?.chapterIndex ?: 0,
+                            totalNumberOfChapters = pi?.numberOfChaptersInBook ?: 0,
+                            totalPage = pi?.numberOfPagesInBook ?: 0
+                        )
                     )
-                )
+                }
             }
 
             /** called when new chapter is loaded.  */
@@ -135,7 +135,7 @@ class SkyEpubReflowableViewer(context: Context) : ReflowableControl(context) {
     }
 
 
-    fun setPagingListener(
+    fun setScanListener(
         listener: (totalPage: Int) -> Unit,
     ) {
         // set the pagingListener which is called when GlobalPagination is true.
@@ -147,7 +147,6 @@ class SkyEpubReflowableViewer(context: Context) : ReflowableControl(context) {
 
             /** called when the pagination of one chapter is finished  */
             override fun onPaged(p0: PagingInformation?) {
-                Timber.v("epub log onPaged: ${p0?.numberOfPagesInChapter}")
                 p0?.let {
                     savedPagingInformation.add(it)
                 }
@@ -155,37 +154,35 @@ class SkyEpubReflowableViewer(context: Context) : ReflowableControl(context) {
 
             /** called when all global pagination is over  */
             override fun onPagingFinished(bookCode: Int) {
-                Timber.v("epub log onPagingFinished: $bookCode, $numberOfPagesInBook")
+                // do nothing
             }
 
             /** should return the number of pages  for given pagingInfromation.  */
             override fun getNumberOfPagesForPagingInformation(p0: PagingInformation?): Int {
                 val value = savedPagingInformation.find {
-                    it.bookCode == p0?.bookCode && it.chapterIndex == p0.chapterIndex
+                    it.chapterIndex == p0?.chapterIndex
                 }?.numberOfPagesInChapter ?: 0
-                Timber.v("epub log getNumberOfPagesForPagingInformation: $value")
                 return value
             }
 
             override fun onScanStarted(p0: Int) {
-                Timber.v("epub log onScanStarted: $p0")
+                // do nothing
             }
 
             override fun onScanned(p0: ItemRef?) {
-                Timber.v("epub log onScanned: ${p0?.pagingInformation?.numberOfPagesInChapter}")
+                // do nothing
             }
 
             override fun onScanFinished(p0: Int) {
-                Timber.v("epub log onScanFinished: $p0, $numberOfPagesInBook")
                 listener.invoke(numberOfPagesInBook)
             }
 
             override fun onTextExtracted(p0: Int, p1: Int, p2: String?) {
-                Timber.v("epub log onTextExtracted: $p0, $p1, $p2")
+                // do nothing
             }
 
             override fun getText(p0: Int, p1: Int): String {
-                Timber.v("epub log getText: $p0, $p1")
+                // do nothing
                 return ""
             }
 
@@ -198,14 +195,10 @@ class SkyEpubReflowableViewer(context: Context) : ReflowableControl(context) {
             }
 
             /** should return pagingInformation for given pagingInfromation.  */
-            override fun getPagingInformation(p0: PagingInformation?): PagingInformation {
+            override fun getPagingInformation(p0: PagingInformation?): PagingInformation? {
                 val value = savedPagingInformation.find {
                     it.bookCode == p0?.bookCode && it.chapterIndex == p0.chapterIndex
-                } ?: PagingInformation().apply {
-                    code = p0?.code ?: 0
-                    numberOfPagesInChapter = 0
                 }
-                Timber.v("epub log getPagingInformation: $value, ${value.numberOfPagesInChapter}")
                 return value
             }
 

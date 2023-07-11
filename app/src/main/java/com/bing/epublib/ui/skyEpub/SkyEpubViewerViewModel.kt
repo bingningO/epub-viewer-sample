@@ -1,3 +1,5 @@
+@file:OptIn(FlowPreview::class)
+
 package com.bing.epublib.ui.skyEpub
 
 import androidx.lifecycle.ViewModel
@@ -10,7 +12,10 @@ import com.bing.epublib.ui.skyEpub.SkyEpubViewerContract.UiData
 import com.bing.epublib.ui.skyEpub.SkyEpubViewerContract.UiInput
 import com.bing.epublib.ui.skyEpub.SkyEpubViewerContract.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -30,10 +35,12 @@ class SkyEpubViewerViewModel @Inject constructor(
     }
 
     private val _onLoadingStateChanged = MutableSharedFlow<Boolean>()
+    private val _onScanLoadingChanged = MutableSharedFlow<Boolean>()
 
     override val uiInput: UiInput = object : UiInput {
         override val onEventConsumed = eventHandler.onEventConsumed
         override val onLoadingStateChanged = _onLoadingStateChanged
+        override val onScanLoadingChanged = _onScanLoadingChanged
     }
 
     // todo make the books can be selected at the screen
@@ -62,10 +69,19 @@ class SkyEpubViewerViewModel @Inject constructor(
     }
 
     private fun startObserveUiInput() {
-        _onLoadingStateChanged.onEach { isLoading ->
-            Timber.v("epub onLoadingStateChanged $isLoading")
-            _uiData.isAnalysisLoading = isLoading
-        }.launchIn(viewModelScope)
+        _onScanLoadingChanged.combine(
+            _onLoadingStateChanged
+        ) { isScanning, isLoading -> isScanning || isLoading }
+            .debounce(200)
+            .onEach { isScanningOrLoading ->
+                Timber.v("epub onScanLoadingChanged $isScanningOrLoading")
+                _uiData.isAnalysisLoading = isScanningOrLoading
+            }.launchIn(viewModelScope)
+
     }
+//        _onLoadingStateChanged.onEach { isLoading ->
+//            Timber.v("epub onLoadingStateChanged $isLoading")
+//            _uiData.isAnalysisLoading = isLoading
+//        }.launchIn(viewModelScope)
 
 }

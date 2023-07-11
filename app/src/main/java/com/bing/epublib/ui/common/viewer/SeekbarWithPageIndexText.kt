@@ -16,23 +16,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.bing.epublib.ui.skyEpub.SkyEpubViewerContract
 import com.bing.epublib.ui.theme.EpubLibTheme
 
 @Composable
 internal fun ViewerControllerSeekbarWithPageIndexText(
     modifier: Modifier = Modifier,
-    pagingInfo: SkyEpubViewerContract.BookPagingInfo,
+    currentIndex: Int,
+    totalPage: Int,
     onChangeSeekbarProgressFinish: (globalIndex: Int) -> Unit,
 ) {
-    var displayProgress: Float by remember(pagingInfo.currentIndexInBook) {
+    var displayProgress: Float by remember(currentIndex) {
         mutableStateOf(
-            pagingInfo.currentIndexInBook.toFloat()
+            currentIndex.toFloat()
         )
     }
-    val maxIndex by remember(pagingInfo.totalPage) {
+    val maxIndex by remember(totalPage) {
         derivedStateOf {
-            (pagingInfo.totalPage.toFloat() - 1).coerceAtLeast(1f)
+            (totalPage.toFloat() - 1).coerceAtLeast(1f)
         }
     }
 
@@ -43,7 +43,7 @@ internal fun ViewerControllerSeekbarWithPageIndexText(
         Text(
             modifier = Modifier.width(80.dp),
             textAlign = TextAlign.Center,
-            text = "${displayProgress.toInt()} / ${maxIndex.toInt()}\nChapter ${pagingInfo.currentChapterIndex}",
+            text = "${displayProgress.toInt()} / ${maxIndex.toInt()}",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.secondary,
         )
@@ -66,13 +66,9 @@ internal fun ViewerControllerSeekbarWithPageIndexText(
 private fun PreviewViewerControllerSeekbarWithPageIndexTextUBook() {
     EpubLibTheme {
         ViewerControllerSeekbarWithPageIndexText(
-            pagingInfo = SkyEpubViewerContract.BookPagingInfo(
-                totalPageInChapter = 10,
-                currentIndexInChapter = 5,
-                currentIndexInBook = 5,
-                currentChapterIndex = 1,
-                totalNumberOfChapters = 10
-            ),
+            modifier = Modifier,
+            currentIndex = 17,
+            totalPage = 120,
             onChangeSeekbarProgressFinish = {},
         )
     }

@@ -23,6 +23,7 @@ class SkyEpubViewerContract {
 
     interface UiInput {
         val onEventConsumed: FlowCollector<SkyEpubViewerEvent>
+        val onScanLoadingChanged: FlowCollector<Boolean>
         val onLoadingStateChanged: FlowCollector<Boolean>
     }
 

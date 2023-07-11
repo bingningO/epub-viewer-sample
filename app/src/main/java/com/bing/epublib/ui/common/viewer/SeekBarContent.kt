@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.bing.epublib.ui.skyEpub.SkyEpubViewerContract
 
 /**
  * @param onChangeSeekbarProgressFinish 0f ~ 1f
@@ -15,7 +14,8 @@ import com.bing.epublib.ui.skyEpub.SkyEpubViewerContract
 @Composable
 fun SeekBarContent(
     modifier: Modifier = Modifier,
-    pagingInfo: SkyEpubViewerContract.BookPagingInfo,
+    currentIndex: Int,
+    totalPage: Int,
     onChangeSeekbarProgressFinish: (globalIndex: Int) -> Unit,
     onClick: () -> Unit,
 ) {
@@ -31,7 +31,8 @@ fun SeekBarContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter),
-            pagingInfo = pagingInfo,
+            currentIndex = currentIndex,
+            totalPage = totalPage,
             onChangeSeekbarProgressFinish = onChangeSeekbarProgressFinish
         )
     }

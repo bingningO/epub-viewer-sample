@@ -1,14 +1,19 @@
 package com.bing.epublib.ui.skyEpub
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import com.bing.epublib.ui.skyEpub.SkyEpubViewerContract.BookPagingInfo
+import com.skytree.epub.SkyActivityState
 import timber.log.Timber
 import java.lang.ref.WeakReference
 
@@ -17,26 +22,63 @@ internal fun SkyEpubViewer(
     modifier: Modifier = Modifier,
     uiData: SkyEpubViewerContract.UiData,
     onLoadingStateChange: (Boolean) -> Unit,
+    onScanningStateChange: (Boolean) -> Unit,
     onTap: () -> Unit,
-    onGetMaxIndex: (Int) -> Unit,
+    onGetTotalPages: (Int) -> Unit,
     onPageChanged: (BookPagingInfo) -> Unit,
     requestJumpGlobalIndexProgress: Int?,
     onRequestJumpFinished: () -> Unit
 ) {
+    val lifecycleOwner = LocalLifecycleOwner.current
     var viewerRef by remember {
         mutableStateOf(WeakReference<SkyEpubReflowableViewer>(null))
     }
     val currentOnLoadingStateChange by rememberUpdatedState(onLoadingStateChange)
+    val currentOnScanningStateChange by rememberUpdatedState(onScanningStateChange)
     val currentOnRequestPageFinished by rememberUpdatedState(onRequestJumpFinished)
     val currentOnTap by rememberUpdatedState(newValue = onTap)
     val currentOnPageChanged by rememberUpdatedState(newValue = onPageChanged)
+    val currentOnGetTotalPagesChanged by rememberUpdatedState(newValue = onGetTotalPages)
     var maxIndex by remember { mutableStateOf(0) }
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                // better call onStart(), onStop(), destroy() along with UI lifecycle depending on SDK requirement
+                Lifecycle.Event.ON_START -> viewerRef.get()?.activityState =
+                    SkyActivityState.Started
+
+                Lifecycle.Event.ON_STOP -> {
+                    Timber.v("epub log viewer stop")
+                    viewerRef.get()?.activityState = SkyActivityState.Stopped
+                }
+
+                Lifecycle.Event.ON_DESTROY -> viewerRef.get()?.destroy()
+                Lifecycle.Event.ON_PAUSE -> {
+                    Timber.v("epub log viewer pause")
+                    viewerRef.get()?.activityState = SkyActivityState.Paused
+                }
+
+                Lifecycle.Event.ON_RESUME -> viewerRef.get()?.activityState =
+                    SkyActivityState.Resumed
+
+                else -> {
+                    /*no-op*/
+                }
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
 
     AndroidView(
         modifier = modifier,
         factory = { factoryContext ->
             Timber.v("epub log viewer factory")
             SkyEpubReflowableViewer(factoryContext).apply {
+                currentOnScanningStateChange.invoke(true)
                 viewerRef = WeakReference(this)
 
                 // init
@@ -45,11 +87,10 @@ internal fun SkyEpubViewer(
                 setStartPositionInBook(0f)
 
                 // setListener, must call this to get totalPages by analysis global pagingInfo
-                setPagingListener { max ->
-                    maxIndex = (max - 1).coerceAtLeast(0)
-                    onGetMaxIndex.invoke(maxIndex)
+                setScanListener { max ->
+                    currentOnGetTotalPagesChanged.invoke(max)
+                    currentOnScanningStateChange.invoke(false)
                 }
-                
                 setLoadingListener {
                     currentOnLoadingStateChange.invoke(it)
                 }
