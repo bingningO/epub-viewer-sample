@@ -12,7 +12,9 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import com.bing.epublib.ui.common.viewer.ViewerIndexData
 import com.bing.epublib.ui.skyEpub.SkyEpubViewerContract.BookPagingInfo
+import com.skytree.epub.NavPoint
 import com.skytree.epub.SkyActivityState
 import timber.log.Timber
 import java.lang.ref.WeakReference
@@ -25,9 +27,11 @@ internal fun SkyEpubViewer(
     onLoadingStateChange: (Boolean) -> Unit,
     onTap: () -> Unit,
     onGetTotalPages: (Int) -> Unit,
+    onGetNavList: (List<ViewerIndexData<NavPoint>>) -> Unit,
     onPageChanged: (BookPagingInfo) -> Unit,
     requestJumpGlobalIndexProgress: Int?,
-    onRequestJumpFinished: () -> Unit
+    requestJumpNav: NavPoint?,
+    onRequestJumpFinished: () -> Unit,
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
     var viewerRef by remember {
@@ -85,9 +89,14 @@ internal fun SkyEpubViewer(
                 setStartPositionInBook(0f)
 
                 // setListener, must call this to get totalPages by analysis global pagingInfo
-                setScanListener { max ->
-                    currentOnGetTotalPagesChanged.invoke(max)
-                }
+                setScanListener(
+                    listener = { max ->
+                        currentOnGetTotalPagesChanged.invoke(max)
+                    },
+                    getNavListener = {
+                        onGetNavList.invoke(it)
+                    }
+                )
                 setLoadingListener {
                     currentOnLoadingStateChange.invoke(it)
                 }
@@ -113,7 +122,12 @@ internal fun SkyEpubViewer(
                     currentOnRequestPageFinished.invoke()
                 }
             }
+            requestJumpNav?.let {
+                if (view.isPaging.not()) {
+                    view.gotoPageByNavPoint(it)
+                    currentOnRequestPageFinished.invoke()
+                }
+            }
         }
     )
-
 }

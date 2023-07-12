@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalFoundationApi::class)
+@file:OptIn(ExperimentalFoundationApi::class, ExperimentalFoundationApi::class)
 
 package com.bing.epublib.ui.skyEpub
 
@@ -21,13 +21,16 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.bing.epublib.ui.common.composable.ErrorScreen
 import com.bing.epublib.ui.common.composable.LoadingScreen
-import com.bing.epublib.ui.common.viewer.SeekBarContent
+import com.bing.epublib.ui.common.viewer.ViewerIndexData
+import com.bing.epublib.ui.common.viewer.ViewerTopContent
 import com.bing.epublib.ui.skyEpub.SkyEpubViewerContract.UiData
+import com.skytree.epub.NavPoint
 import kotlinx.coroutines.launch
 
 @Composable
 fun SkyEpubViewerScreen(
     viewModel: SkyEpubViewerContract.ViewModel = hiltViewModel<SkyEpubViewerViewModel>(),
+    onCloseClick: () -> Unit
 ) {
     val uiState = viewModel.uiState
     val uiInput = viewModel.uiInput
@@ -41,6 +44,7 @@ fun SkyEpubViewerScreen(
     SkyEpubViewerContent(
         uiData = uiState.uiData,
         uiInput = uiInput,
+        onCloseClick = onCloseClick
     )
 }
 
@@ -48,13 +52,9 @@ fun SkyEpubViewerScreen(
 private fun SkyEpubViewerContent(
     uiData: UiData,
     uiInput: SkyEpubViewerContract.UiInput,
+    onCloseClick: () -> Unit
 ) {
     when {
-//        uiData.isInitLoading -> {
-//            // loading for preparing book data
-//            LoadingScreen()
-//        }
-
         uiData.error != null -> {
             ErrorScreen(error = uiData.error!!)
         }
@@ -65,10 +65,10 @@ private fun SkyEpubViewerContent(
             ) {
                 if (uiData.bookProvider != null) {
                     SkyEpubViewerSuccessContent(
-                        uiData = uiData, uiInput = uiInput
+                        uiData = uiData, uiInput = uiInput, onCloseClick = onCloseClick
                     )
                 }
-                
+
                 if (uiData.isLoading) {
                     LoadingScreen()
                 }
@@ -80,13 +80,18 @@ private fun SkyEpubViewerContent(
 @Composable
 private fun SkyEpubViewerSuccessContent(
     uiData: UiData,
-    uiInput: SkyEpubViewerContract.UiInput
+    uiInput: SkyEpubViewerContract.UiInput,
+    onCloseClick: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    var isShowController by remember { mutableStateOf(false) }
+    var isShowTopContent by remember { mutableStateOf(false) }
     var maxIndexFromViewerSDK by remember { mutableStateOf(0) }
     var currentGlobalIndexFromViewerSDK by remember { mutableStateOf(0) }
     var progressChangeRequestByController: Int? by remember { mutableStateOf(null) }
+    var navChangeRequestByToc: NavPoint? by remember { mutableStateOf(null) }
+    var navListData: List<ViewerIndexData<NavPoint>> by remember {
+        mutableStateOf(emptyList())
+    }
 
     CompositionLocalProvider(
         LocalOverscrollConfiguration provides null,
@@ -97,8 +102,9 @@ private fun SkyEpubViewerSuccessContent(
                 scope.launch { uiInput.onLoadingStateChanged.emit(it) }
             },
             requestJumpGlobalIndexProgress = progressChangeRequestByController,
+            requestJumpNav = navChangeRequestByToc,
             onTap = {
-                isShowController = true
+                isShowTopContent = true
             },
             onPageChanged = {
                 maxIndexFromViewerSDK = it.totalPage
@@ -109,23 +115,34 @@ private fun SkyEpubViewerSuccessContent(
             },
             onRequestJumpFinished = {
                 progressChangeRequestByController = null
-            }
+                navChangeRequestByToc = null
+            },
+            onGetNavList = {
+                navListData = it
+            },
         )
     }
 
     AnimatedVisibility(
-        visible = isShowController,
+        visible = isShowTopContent,
         enter = fadeIn(),
         exit = fadeOut()
     ) {
-
-        SeekBarContent(currentIndex = currentGlobalIndexFromViewerSDK,
+        ViewerTopContent<NavPoint>(
+            currentIndex = currentGlobalIndexFromViewerSDK,
             totalPage = maxIndexFromViewerSDK,
             onChangeSeekbarProgressFinish = {
                 progressChangeRequestByController = it
             },
             onClick = {
-                isShowController = false
-            })
+                isShowTopContent = false
+            },
+            onCloseClick = onCloseClick,
+            navList = navListData,
+            onNavItemClick = {
+                isShowTopContent = false
+                navChangeRequestByToc = it
+            }
+        )
     }
 }

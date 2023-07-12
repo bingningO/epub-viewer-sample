@@ -3,10 +3,12 @@ package com.bing.epublib.ui.skyEpub
 import android.content.Context
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import com.bing.epublib.ui.common.viewer.ViewerIndexData
 import com.bing.epublib.ui.skyEpub.SkyEpubViewerContract.BookMetaData
 import com.bing.epublib.ui.skyEpub.SkyEpubViewerContract.BookPagingInfo
 import com.skytree.epub.ClickListener
 import com.skytree.epub.ItemRef
+import com.skytree.epub.NavPoint
 import com.skytree.epub.PageInformation
 import com.skytree.epub.PageMovedListener
 import com.skytree.epub.PageTransition
@@ -61,6 +63,23 @@ class SkyEpubReflowableViewer(context: Context) : ReflowableControl(context) {
             }
             listener.invoke(isLoading)
         }
+    }
+
+    private fun getNavData(): List<ViewerIndexData<NavPoint>> {
+        val navDatas = navPoints
+        val navList = mutableListOf<ViewerIndexData<NavPoint>>()
+        Timber.v("epub log get navPoints: ${navDatas.size}")
+        (0 until navDatas.size).forEach {
+            val nav = navDatas.getNavPoint(it)
+            navList.add(
+                ViewerIndexData(
+                    indexTitle = nav.text,
+                    nestLevel = nav.depth,
+                    pageData = nav
+                )
+            )
+        }
+        return navList
     }
 
     /**
@@ -140,6 +159,7 @@ class SkyEpubReflowableViewer(context: Context) : ReflowableControl(context) {
 
     fun setScanListener(
         listener: (totalPage: Int) -> Unit,
+        getNavListener: (List<ViewerIndexData<NavPoint>>) -> Unit
     ) {
         // set the pagingListener which is called when GlobalPagination is true.
         // this enables the calculation for the total number of pages in book, not in chapter.
@@ -178,6 +198,7 @@ class SkyEpubReflowableViewer(context: Context) : ReflowableControl(context) {
 
             override fun onScanFinished(p0: Int) {
                 listener.invoke(numberOfPagesInBook)
+                getNavListener.invoke(getNavData())
             }
 
             override fun onTextExtracted(p0: Int, p1: Int, p2: String?) {

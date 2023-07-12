@@ -1,5 +1,5 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <string name="app_name">EpubLib</string>
 
-    <string name="book_read_point" tools:ignore="ExtraTranslation">%1$d / %2$d\n%3$.2f%</string>
+    <string name="table_of_content">TOC</string>
 </resources>

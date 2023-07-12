@@ -27,7 +27,12 @@ class MainActivity : ComponentActivity() {
                     startDestination = ScreenRoutes.Home.route
                 ) {
                     addHomeTopLevel(navController)
-                    addSkyEpubViewerTopLevel(navController)
+                    addSkyEpubViewerTopLevel(
+                        navController,
+                        onCloseClick = {
+                            finish()
+                        }
+                    )
                 }
             }
         }
