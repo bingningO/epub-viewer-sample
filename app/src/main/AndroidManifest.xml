@@ -30,7 +30,7 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:label="@string/app_name"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:theme="@style/Theme.EpubLib">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
