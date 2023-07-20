@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.bing.epublib.ui.common.viewer.ViewerIndexData
-import com.bing.epublib.ui.skyEpub.SkyEpubViewerContract.BookMetaData
 import com.bing.epublib.ui.skyEpub.SkyEpubViewerContract.BookPagingInfo
 import com.skytree.epub.ClickListener
 import com.skytree.epub.ItemRef
@@ -42,17 +41,6 @@ class SkyEpubReflowableViewer(context: Context) : ReflowableControl(context) {
         // AVOID GLOBAL PAGINATION FOR LOW SPEC DEVICES.
         // set it as true for getting page number of entire book.
         isGlobalPagination = true
-    }
-
-    // for display in other composables
-    fun getBookMetaData(): BookMetaData {
-        val data = book
-        return BookMetaData(
-            title = data.title,
-            description = data.description,
-            isFixedLayout = data.isFixedLayout,
-            orientation = data.orientation
-        )
     }
 
     fun setLoadingListener(listener: (isLoading: Boolean) -> Unit) {
@@ -96,6 +84,7 @@ class SkyEpubReflowableViewer(context: Context) : ReflowableControl(context) {
                             totalPageInChapter = pi?.numberOfPagesInChapter ?: 0,
                             currentIndexInChapter = pi?.pageIndex ?: 0,
                             currentIndexInBook = pi?.pageIndexInBook ?: 0,
+                            currentPositionInBook = pi?.pagePositionInBook ?: 0.0,
                             currentChapterIndex = pi?.chapterIndex ?: 0,
                             totalNumberOfChapters = pi?.numberOfChaptersInBook ?: 0,
                             totalPage = pi?.numberOfPagesInBook ?: 0

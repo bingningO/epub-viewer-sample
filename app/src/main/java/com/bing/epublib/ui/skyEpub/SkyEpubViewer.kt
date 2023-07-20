@@ -79,14 +79,14 @@ internal fun SkyEpubViewer(
     AndroidView(
         modifier = modifier,
         factory = { factoryContext ->
-            Timber.v("epub log viewer factory")
+            Timber.v("epub log viewer factory, ${uiData.initialPositionInBook}")
             SkyEpubReflowableViewer(factoryContext).apply {
                 viewerRef = WeakReference(this)
 
                 // init
                 setBookPath(uiData.bookPath)
                 setContentProvider(uiData.bookProvider)
-                setStartPositionInBook(0f)
+                setStartPositionInBook(uiData.initialPositionInBook)
 
                 // setListener, must call this to get totalPages by analysis global pagingInfo
                 setScanListener(

@@ -3,6 +3,7 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'com.google.dagger.hilt.android'
     id("kotlin-kapt")
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -39,7 +40,7 @@ android {
         compose true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion '1.4.8'
+        kotlinCompilerExtensionVersion '1.5.0'
     }
     packagingOptions {
         resources {
@@ -50,8 +51,9 @@ android {
 
 dependencies {
     def nav_version = "2.6.0"
-    def hilt_version = "2.46.1"
+    def hilt_version = "2.47"
     def hilt_navigation_compose = "1.0.0"
+    def room_version = "2.5.2"
 
     // libs
     implementation files('libs/skyepub.jar')
@@ -85,9 +87,13 @@ dependencies {
     // dagger
     implementation "com.google.dagger:hilt-android:$hilt_version"
     implementation "androidx.hilt:hilt-navigation-compose:$hilt_navigation_compose"
-    kapt 'com.google.dagger:hilt-compiler:2.46.1'
-}
+    kapt "com.google.dagger:hilt-compiler:$hilt_version"
 
-kapt {
-    correctErrorTypes true
+    // room
+    implementation "androidx.room:room-runtime:$room_version"
+    implementation "androidx.room:room-ktx:$room_version"
+    ksp "androidx.room:room-compiler:$room_version"
+    annotationProcessor "androidx.room:room-compiler:$room_version"
+    implementation "androidx.room:room-guava:$room_version"
+    testImplementation "androidx.room:room-testing:$room_version"
 }

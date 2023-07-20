@@ -85,8 +85,19 @@ private fun SkyEpubViewerSuccessContent(
 ) {
     val scope = rememberCoroutineScope()
     var isShowTopContent by remember { mutableStateOf(false) }
-    var maxIndexFromViewerSDK by remember { mutableStateOf(0) }
-    var currentGlobalIndexFromViewerSDK by remember { mutableStateOf(0) }
+    var maxIndexFromViewerSDK: Int by remember { mutableStateOf(0) }
+    var currentGlobalIndexFromViewerSDK: Int by remember(
+        uiData.initialPositionInBook,
+        maxIndexFromViewerSDK
+    ) {
+        mutableStateOf(
+            if (maxIndexFromViewerSDK != 0) {
+                (uiData.initialPositionInBook * maxIndexFromViewerSDK).toInt()
+            } else {
+                0
+            }
+        )
+    }
     var progressChangeRequestByController: Int? by remember { mutableStateOf(null) }
     var navChangeRequestByToc: NavPoint? by remember { mutableStateOf(null) }
     var navListData: List<ViewerIndexData<NavPoint>> by remember {
@@ -109,6 +120,9 @@ private fun SkyEpubViewerSuccessContent(
             onPageChanged = {
                 maxIndexFromViewerSDK = it.totalPage
                 currentGlobalIndexFromViewerSDK = it.currentIndexInBook
+                scope.launch {
+                    uiInput.onChangePagePosition.emit(it.currentPositionInBook)
+                }
             },
             onGetTotalPages = {
                 maxIndexFromViewerSDK = it
