@@ -2,6 +2,7 @@ package com.bing.epublib.ui.skyEpub
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.bing.epublib.epubDomain.EpubFileHandler
 import com.bing.epublib.epubDomain.EpubFileReader
 import com.bing.epublib.model.EpubInfo
 import com.bing.epublib.repository.EpubInfoRepository
@@ -21,8 +22,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SkyEpubViewerViewModel @Inject constructor(
-    private val epubFileReader: EpubFileReader,
+    private val epubFileHandler: EpubFileHandler,
     private val dataRepository: EpubInfoRepository,
+    private val epubFileReaderFactory: EpubFileReader.Factory,
 ) : ViewModel(), SkyEpubViewerContract.ViewModel {
 
     private val eventHandler = UIEventHandler<SkyEpubViewerEvent>(viewModelScope)
@@ -46,6 +48,7 @@ class SkyEpubViewerViewModel @Inject constructor(
     private val bookFileCode = "0001"
     private var isPreparingData = true
     private var currentPositionInBook = 0.0
+    private val epubFileReader = epubFileReaderFactory.create(bookName)
 
     init {
         startObserveUiInput()
@@ -66,14 +69,19 @@ class SkyEpubViewerViewModel @Inject constructor(
         }
 
         try {
-            epubFileReader.prepareBook(bookName)
+            epubFileHandler.prepareBook(bookName)
+
+            epubFileReader.isFixedLayout().let {
+                Timber.v("epub log isFixedLayout: $it")
+                _uiData.isFixedLayout = it
+            }
         } catch (e: Throwable) {
             Timber.e(e, "epub prepare book error")
             _uiData.error = e
         } finally {
             isPreparingData = false
             _uiData.bookProvider = SkyProvider()
-            _uiData.bookPath = epubFileReader.getBookPath(bookName)
+            _uiData.bookPath = epubFileHandler.getBookPath(bookName)
         }
     }
 
