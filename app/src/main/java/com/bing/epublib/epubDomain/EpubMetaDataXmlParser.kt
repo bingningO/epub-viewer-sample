@@ -32,9 +32,9 @@ import javax.inject.Singleton
  * refer for how to parse xml: https://developer.android.com/training/basics/network-ops/xml
  */
 @Singleton
-class EpubMetaXmlParser @Inject constructor(
+class EpubMetaDataXmlParser @Inject constructor(
     @IoDispatcher private val dispatcher: CoroutineDispatcher
-) {
+) : EpubXmlParser() {
 
     @Throws(XmlPullParserException::class, IOException::class)
     suspend fun getLayoutValue(inputStream: InputStream): String =
@@ -98,20 +98,6 @@ class EpubMetaXmlParser @Inject constructor(
         }
         parser.require(XmlPullParser.END_TAG, null, TAG_META)
         return ""
-    }
-
-    @Throws(XmlPullParserException::class, IOException::class)
-    private fun skip(parser: XmlPullParser) {
-        if (parser.eventType != XmlPullParser.START_TAG) {
-            throw IllegalStateException()
-        }
-        var depth = 1
-        while (depth != 0) {
-            when (parser.next()) {
-                XmlPullParser.END_TAG -> depth--
-                XmlPullParser.START_TAG -> depth++
-            }
-        }
     }
 
     companion object {

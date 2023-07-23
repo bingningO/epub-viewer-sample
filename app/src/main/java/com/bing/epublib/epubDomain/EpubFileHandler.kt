@@ -58,6 +58,10 @@ class EpubFileHandler @Inject constructor(
 
     fun getBookPath(fileName: String) = "$dstPath$fileName"
 
+    fun onClose() {
+        // todo delete all files in dstPath
+    }
+
     companion object {
         private const val BOOK_PATH = "books/"
         private const val INPUT_BUFF_SIZE = 16 * 1024
