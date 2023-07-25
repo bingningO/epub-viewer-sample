@@ -46,7 +46,8 @@ class SkyEpubViewerViewModel @Inject constructor(
     // todo make the books can be selected at the screen
 //    private val bookName = "Alice.epub"
     private val bookName = "page-blanche-fixed.epub"
-    private val bookFileCode = "0001"
+    
+    private val bookFileCode = 2
     private var isPreparingData = true
     private var currentPositionInBook = 0.0
     private val epubFileReader = epubFileReaderFactory.create(bookName)
@@ -89,6 +90,7 @@ class SkyEpubViewerViewModel @Inject constructor(
             isPreparingData = false
             _uiData.bookProvider = SkyProvider()
             _uiData.bookPath = epubFileHandler.getBookPath(bookName)
+            _uiData.bookCode = bookFileCode
         }
     }
 

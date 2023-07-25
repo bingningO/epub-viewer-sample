@@ -10,12 +10,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.bing.epublib.ui.common.viewer.ViewerIndexData
 import com.bing.epublib.ui.skyEpub.SkyEpubViewerContract.BookPagingInfo
 import com.skytree.epub.NavPoint
-import com.skytree.epub.SkyActivityState
 import timber.log.Timber
 import java.lang.ref.WeakReference
 
@@ -35,7 +33,7 @@ internal fun SkyEpubViewer(
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
     var viewerRef by remember {
-        mutableStateOf(WeakReference<SkyEpubReflowableViewer>(null))
+        mutableStateOf(WeakReference<SkyEpubFixedControl>(null))
     }
     val currentOnLoadingStateChange by rememberUpdatedState(onLoadingStateChange)
     val currentOnRequestPageFinished by rememberUpdatedState(onRequestJumpFinished)
@@ -48,22 +46,22 @@ internal fun SkyEpubViewer(
         val observer = LifecycleEventObserver { _, event ->
             when (event) {
                 // better call onStart(), onStop(), destroy() along with UI lifecycle depending on SDK requirement
-                Lifecycle.Event.ON_START -> viewerRef.get()?.activityState =
-                    SkyActivityState.Started
-
-                Lifecycle.Event.ON_STOP -> {
-                    Timber.v("epub log viewer stop")
-                    viewerRef.get()?.activityState = SkyActivityState.Stopped
-                }
-
-                Lifecycle.Event.ON_DESTROY -> viewerRef.get()?.destroy()
-                Lifecycle.Event.ON_PAUSE -> {
-                    Timber.v("epub log viewer pause")
-                    viewerRef.get()?.activityState = SkyActivityState.Paused
-                }
-
-                Lifecycle.Event.ON_RESUME -> viewerRef.get()?.activityState =
-                    SkyActivityState.Resumed
+//                Lifecycle.Event.ON_START -> viewerRef.get()?.activityState =
+//                    SkyActivityState.Started
+//
+//                Lifecycle.Event.ON_STOP -> {
+//                    Timber.v("epub log viewer stop")
+//                    viewerRef.get()?.activityState = SkyActivityState.Stopped
+//                }
+//
+//                Lifecycle.Event.ON_DESTROY -> viewerRef.get()?.destroy()
+//                Lifecycle.Event.ON_PAUSE -> {
+//                    Timber.v("epub log viewer pause")
+//                    viewerRef.get()?.activityState = SkyActivityState.Paused
+//                }
+//
+//                Lifecycle.Event.ON_RESUME -> viewerRef.get()?.activityState =
+//                    SkyActivityState.Resumed
 
                 else -> {
                     /*no-op*/
@@ -80,13 +78,13 @@ internal fun SkyEpubViewer(
         modifier = modifier,
         factory = { factoryContext ->
             Timber.v("epub log viewer factory, ${uiData.initialPositionInBook}")
-            SkyEpubReflowableViewer(factoryContext).apply {
+            SkyEpubFixedControl(factoryContext, uiData.bookCode).apply {
                 viewerRef = WeakReference(this)
 
                 // init
                 setBookPath(uiData.bookPath)
                 setContentProvider(uiData.bookProvider)
-                setStartPositionInBook(uiData.initialPositionInBook)
+//                setStartPositionInBook(uiData.initialPositionInBook)
 
                 // setListener, must call this to get totalPages by analysis global pagingInfo
                 setScanListener(
@@ -112,22 +110,22 @@ internal fun SkyEpubViewer(
         },
         update = { view ->
             Timber.v("epub log viewer update")
-            requestJumpGlobalIndexProgress?.let {
-                if (view.isPaging.not()) {
-                    val ppb = view.getPagePositionInBookByPageIndexInBook(it)
-                    // So absolute position in epub is expressed as pagePositionInBook.
-                    // This is float value from 0.0f to 1.0f for entire book.
-                    view.gotoPageByPagePositionInBook(ppb)
-
-                    currentOnRequestPageFinished.invoke()
-                }
-            }
-            requestJumpNav?.let {
-                if (view.isPaging.not()) {
-                    view.gotoPageByNavPoint(it)
-                    currentOnRequestPageFinished.invoke()
-                }
-            }
+//            requestJumpGlobalIndexProgress?.let {
+//                if (view.isPaging.not()) {
+//                    val ppb = view.getPagePositionInBookByPageIndexInBook(it)
+//                    // So absolute position in epub is expressed as pagePositionInBook.
+//                    // This is float value from 0.0f to 1.0f for entire book.
+//                    view.gotoPageByPagePositionInBook(ppb)
+//
+//                    currentOnRequestPageFinished.invoke()
+//                }
+//            }
+//            requestJumpNav?.let {
+//                if (view.isPaging.not()) {
+//                    view.gotoPageByNavPoint(it)
+//                    currentOnRequestPageFinished.invoke()
+//                }
+//            }
         }
     )
 }

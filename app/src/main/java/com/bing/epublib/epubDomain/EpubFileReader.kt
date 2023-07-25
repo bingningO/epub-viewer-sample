@@ -6,9 +6,9 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.BufferedInputStream
-import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileInputStream
+import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
@@ -22,8 +22,8 @@ class EpubFileReader @AssistedInject constructor(
     private val epubMetaInfoXmlParser: EpubMetaInfoXmlParser,
     private val epubMetaDataXmlParser: EpubMetaDataXmlParser,
 ) {
-    private val dstEpubPath = "${context.filesDir.path}/${BOOK_PATH}$fileName"
-    private val unpackDstPath = "${context.filesDir.path}/$UNPACK_BOOK_PATH/$fileName"
+    private val dstEpubPath = "${context.filesDir.path}/${BOOK_PATH}"
+    private val unpackDstPath = "${context.filesDir.path}/$UNPACK_BOOK_PATH"
     private val unpackMetaInfoPath =
         "${context.filesDir.path}/${UNPACK_BOOK_PATH}$fileName$UNPACK_META_INFO_PATH"
 
@@ -44,7 +44,10 @@ class EpubFileReader @AssistedInject constructor(
     private fun getMetaInfoInputStream(): InputStream? {
         val metaInfoFile = File(unpackMetaInfoPath)
         if (metaInfoFile.exists().not()) {
-            unpackZip("${context.filesDir.path}/${BOOK_PATH}", fileName)
+            unzip(
+                zipFile = File(dstEpubPath + fileName),
+                targetDirectory = File("$unpackDstPath/$fileName")
+            )
         }
         return metaInfoFile.let {
             if (it.canRead()) {
@@ -56,7 +59,7 @@ class EpubFileReader @AssistedInject constructor(
     }
 
     private fun getMetaDataInputStream(metaDataFileName: String): InputStream? {
-        return File("$unpackDstPath/$metaDataFileName").let {
+        return File("$unpackDstPath/$fileName/$metaDataFileName").let {
             if (it.canRead()) {
                 FileInputStream(it)
             } else {
@@ -66,28 +69,35 @@ class EpubFileReader @AssistedInject constructor(
     }
 
     @Throws(IOException::class)
-    private fun unpackZip(path: String, name: String) {
-        val `is`: InputStream = FileInputStream(path + name)
-        val zis = ZipInputStream(BufferedInputStream(`is`))
-        var ze: ZipEntry
-        while (zis.nextEntry.also { ze = it } != null) {
-            val baos = ByteArrayOutputStream()
-            val buffer = ByteArray(1024)
+    fun unzip(zipFile: File?, targetDirectory: File?) {
+        val zis = ZipInputStream(
+            BufferedInputStream(FileInputStream(zipFile))
+        )
+        zis.use { zis ->
+            var ze: ZipEntry
             var count: Int
-            val fileName = ze.name
-            val fout = FileOutputStream(dstEpubPath + fileName)
-
-            // reading and writing
-            while (zis.read(buffer).also { count = it } != -1) {
-                baos.write(buffer, 0, count)
-                val bytes = baos.toByteArray()
-                fout.write(bytes)
-                baos.reset()
+            val buffer = ByteArray(8192)
+            while (null != zis.nextEntry.also { ze = it ?: return@use }) {
+                val file = File(targetDirectory, ze.name)
+                val dir = if (ze.isDirectory) file else file.parentFile
+                if (!dir.isDirectory && !dir.mkdirs()) throw FileNotFoundException(
+                    "Failed to ensure directory: " +
+                            dir.absolutePath
+                )
+                if (ze.isDirectory) continue
+                val fout = FileOutputStream(file)
+                try {
+                    while (zis.read(buffer).also { count = it } != -1) fout.write(buffer, 0, count)
+                } finally {
+                    fout.close()
+                }
+                /* if time should be restored as well
+                long time = ze.getTime();
+                if (time > 0)
+                    file.setLastModified(time);
+                */
             }
-            fout.close()
-            zis.closeEntry()
         }
-        zis.close()
     }
 
     companion object {

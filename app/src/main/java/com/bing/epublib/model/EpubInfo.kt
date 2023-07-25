@@ -1,7 +1,7 @@
 package com.bing.epublib.model
 
 data class EpubInfo(
-    val fileCode: String,
+    val fileCode: Int,
     val startPositionInBook: Double,
     val setting: EpubSetting? = null,
 )

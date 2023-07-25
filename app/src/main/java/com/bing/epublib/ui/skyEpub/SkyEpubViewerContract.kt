@@ -36,6 +36,7 @@ class SkyEpubViewerContract {
         val error: Throwable?
         val bookProvider: SkyProvider?
         val bookPath: String
+        val bookCode: Int
         val isFixedLayout: Boolean
     }
 
@@ -50,11 +51,12 @@ class SkyEpubViewerContract {
         val totalNumberOfChapters: Int
     )
 
-    internal class MutableUiData() : UiData {
+    internal class MutableUiData : UiData {
         override var isLoading: Boolean by mutableStateOf(false)
         override var initialPositionInBook: Double by mutableStateOf(0.0)
         override var error: Throwable? by mutableStateOf(null)
         override var bookPath: String by mutableStateOf("")
+        override var bookCode: Int by mutableStateOf(0)
         override var bookProvider: SkyProvider? by mutableStateOf(null)
         override var isFixedLayout: Boolean by mutableStateOf(false)
     }

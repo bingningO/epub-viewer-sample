@@ -20,12 +20,11 @@ import timber.log.Timber
 /**
  * custom viewer extending SkyEpub SDK#ReflowableControl
  */
-class SkyEpubReflowableViewer(context: Context) : ReflowableControl(context) {
+class SkyEpubReflowableControl(context: Context, bookCode: Int) : ReflowableControl(context) {
 
     private val savedPagingInformation = arrayListOf<PagingInformation>()
 
     init {
-        Timber.v("epub log SkyEpubReflowableViewer init")
         setForegroundColor(Color.White.toArgb())
         setBackgroundColor(Color.Gray.toArgb())
         setPageTransition(PageTransition.Curl)
@@ -33,7 +32,7 @@ class SkyEpubReflowableViewer(context: Context) : ReflowableControl(context) {
         setSwipeEnabled(true)
         adjustContentWidth(true)
         // set the bookCode to identify the book file.
-        setBookCode(BOOK_CODE)
+        setBookCode(bookCode)
 
         // if true, globalPagination will be activated.
         // this enables the calculation of page number based on entire book ,not on each chapter.
@@ -70,9 +69,6 @@ class SkyEpubReflowableViewer(context: Context) : ReflowableControl(context) {
         return navList
     }
 
-    /**
-     * @param listener pageIndex: Int start from 0 ~ maxIndex
-     */
     fun setOnPageMovedListener(listener: (BookPagingInfo) -> Unit) {
         setPageMovedListener(object : PageMovedListener {
 
@@ -216,9 +212,5 @@ class SkyEpubReflowableViewer(context: Context) : ReflowableControl(context) {
             }
 
         })
-    }
-
-    companion object {
-        private const val BOOK_CODE = 1
     }
 }

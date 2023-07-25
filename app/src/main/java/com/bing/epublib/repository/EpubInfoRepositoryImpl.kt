@@ -16,7 +16,7 @@ internal class EpubInfoRepositoryImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @ApplicationScope private val appScope: CoroutineScope,
 ) : EpubInfoRepository {
-    override suspend fun getEpubInfo(fileCode: String): EpubInfo? =
+    override suspend fun getEpubInfo(fileCode: Int): EpubInfo? =
         with(appScope.coroutineContext) {
             return@with dao.getEpubInfo(fileCode)?.toModule()
         }
@@ -26,7 +26,7 @@ internal class EpubInfoRepositoryImpl @Inject constructor(
             dao.insert(epubInfo.toEntity())
         }
 
-    override suspend fun deleteEpubInfo(fileCode: String) =
+    override suspend fun deleteEpubInfo(fileCode: Int) =
         withContext(appScope.coroutineContext) {
             dao.delete(fileCode)
         }
