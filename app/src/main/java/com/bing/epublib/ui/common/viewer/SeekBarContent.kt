@@ -3,6 +3,7 @@ package com.bing.epublib.ui.common.viewer
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,6 +23,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.bing.epublib.R
+import com.bing.epublib.model.FontSize
 import com.bing.epublib.ui.theme.EpubLibTheme
 import com.bing.epublib.ui.theme.Paddings
 
@@ -36,8 +38,10 @@ fun SeekBarContent(
     onChangeSeekbarProgressFinish: (globalIndex: Int) -> Unit,
     onClick: () -> Unit,
     onCloseClick: () -> Unit,
-    onIndexClick: () -> Unit
+    onIndexClick: () -> Unit,
+    onFontSizeSelected: (FontSize) -> Unit,
 ) {
+
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -51,14 +55,27 @@ fun SeekBarContent(
             onIndexClick = onIndexClick,
         )
 
-        ViewerControllerSeekbarWithPageIndexText(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .align(Alignment.BottomCenter),
-            currentIndex = currentIndex,
-            totalPage = totalPage,
-            onChangeSeekbarProgressFinish = onChangeSeekbarProgressFinish
-        )
+                .align(Alignment.BottomCenter)
+        ) {
+            ViewerControllerSeekbarWithPageIndexText(
+                modifier = Modifier.fillMaxWidth(),
+                currentIndex = currentIndex,
+                totalPage = totalPage,
+                onChangeSeekbarProgressFinish = onChangeSeekbarProgressFinish
+            )
+
+            SettingButtonWithPopup(
+                textResId = R.string.font_size,
+                menuItems = arrayOf(FontSize.BIGGER, FontSize.SMALLER),
+                onItemSelect = {
+                    onFontSizeSelected(it)
+                },
+                selected = null
+            )
+        }
     }
 }
 
@@ -111,10 +128,8 @@ private fun ViewerControllerBackground(
 @Composable
 private fun ViewerControllerTopBar(
     modifier: Modifier = Modifier,
-//    showSearchButton: Boolean,
     onCloseClick: () -> Unit,
     onIndexClick: () -> Unit,
-//    onSearchClick: () -> Unit,
 ) {
     Box(modifier = modifier.fillMaxWidth()) {
         IconButton(
@@ -135,20 +150,6 @@ private fun ViewerControllerTopBar(
                 .align(Alignment.TopEnd)
                 .padding(end = Paddings.default)
         ) {
-//            if (showSearchButton) {
-//                IconButton(
-//                    onClick = onSearchClick,
-//                ) {
-//                    Icon(
-//                        modifier = modifier
-//                            .size(dimensionResource(jp.unext.mediaplayer.common.core.R.dimen.ui_common_app_bar_height))
-//                            .padding(16.dp),
-//                        painter = painterResource(jp.unext.mediaplayer.common.core.R.drawable.ui_common_ic_mirai_ui_search),
-//                        contentDescription = stringResource(jp.unext.mediaplayer.common.core.R.string.ui_common_search),
-//                    )
-//                }
-//            }
-
             IconButton(
                 onClick = onIndexClick,
             ) {
@@ -172,8 +173,10 @@ private fun SeekBarContentPreview() {
             currentIndex = 12,
             totalPage = 60,
             onChangeSeekbarProgressFinish = {},
-            onClick = { /*TODO*/ },
-            onCloseClick = { /*TODO*/ }) {
-        }
+            onClick = {},
+            onCloseClick = {},
+            onIndexClick = {},
+            onFontSizeSelected = {},
+        )
     }
 }

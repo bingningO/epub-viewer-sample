@@ -10,6 +10,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.bing.epublib.R
+import com.bing.epublib.model.FontSize
 import com.bing.epublib.ui.common.composable.SlidePanelWithTranslucentBackground
 
 @Composable
@@ -21,13 +22,14 @@ fun <T> ViewerTopContent(
     onClick: () -> Unit,
     onCloseClick: () -> Unit,
     navList: List<ViewerIndexData<T>>,
-    onNavItemClick: (T) -> Unit
+    onNavItemClick: (T) -> Unit,
+    onFontSizeSelected: (FontSize) -> Unit,
 ) {
     var isSlidePaneVisible by remember {
         mutableStateOf(false)
     }
 
-    Box() {
+    Box {
         SeekBarContent(
             currentIndex = currentIndex,
             totalPage = totalPage,
@@ -36,7 +38,8 @@ fun <T> ViewerTopContent(
             onCloseClick = onCloseClick,
             onIndexClick = {
                 isSlidePaneVisible = true
-            }
+            },
+            onFontSizeSelected = onFontSizeSelected
         )
 
         SlidePanelWithTranslucentBackground(

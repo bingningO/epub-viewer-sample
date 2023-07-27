@@ -156,6 +156,9 @@ private fun SkyEpubViewerSuccessContent(
             onNavItemClick = {
                 isShowTopContent = false
                 navChangeRequestByToc = it
+            },
+            onFontSizeSelected = {
+                // todo
             }
         )
     }
