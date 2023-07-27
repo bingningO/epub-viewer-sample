@@ -43,11 +43,11 @@ class SkyEpubViewerViewModel @Inject constructor(
         override val onChangePagePosition = _onChangePagePosition
     }
 
-    // todo make the books can be selected at the screen
-//    private val bookName = "Alice.epub"
-    private val bookName = "page-blanche-fixed.epub"
-    
-    private val bookFileCode = 2
+    // change the book name here to open different book file(also they need to be copied to assets dir)
+    private val bookName = "Alice.epub"
+//    private val bookName = "page-blanche-fixed.epub"
+
+    private val bookFileCode = 1
     private var isPreparingData = true
     private var currentPositionInBook = 0.0
     private val epubFileReader = epubFileReaderFactory.create(bookName)
@@ -81,6 +81,7 @@ class SkyEpubViewerViewModel @Inject constructor(
 
             epubFileReader.isFixedLayout().let {
                 Timber.v("epub log isFixedLayout: $it")
+                // todo if it's a fixedLayout, open the fixedViewerScreen
                 _uiData.isFixedLayout = it
             }
         } catch (e: Throwable) {
@@ -102,7 +103,6 @@ class SkyEpubViewerViewModel @Inject constructor(
         _onChangePagePosition.onEach {
             currentPositionInBook = it
             viewModelScope.launch {
-                Timber.v("epub log onStop: $currentPositionInBook")
                 dataRepository.insertEpubInfo(
                     EpubInfo(
                         fileCode = bookFileCode,

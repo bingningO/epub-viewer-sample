@@ -16,6 +16,7 @@ import com.skytree.epub.State
 
 /**
  * custom viewer extending SkyEpub SDK#FixedControl
+ * todo WIP
  */
 class SkyEpubFixedControl(context: Context, bookCodeValue: Int) : FixedControl(context),
     SkyEpubControlInterface {
