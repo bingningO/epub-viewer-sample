@@ -2,6 +2,7 @@ package com.bing.epublib.ui.skyEpub
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -76,11 +77,16 @@ internal fun SkyEpubViewer(
         }
     }
 
+    LaunchedEffect(uiData.realFontSize) {
+        viewerRef.get()?.setFontSizeIfNotLoading(uiData.realFontSize)
+    }
+
     AndroidView(
         modifier = modifier,
         factory = { factoryContext ->
             Timber.v("epub log viewer factory, ${uiData.initialPositionInBook}")
-            SkyEpubReflowableControl(factoryContext, uiData.bookCode).apply {
+            currentOnLoadingStateChange.invoke(true)
+            SkyEpubReflowableControl(factoryContext, uiData.bookCode, uiData.realFontSize).apply {
                 viewerRef = WeakReference(this)
 
                 // init
@@ -92,6 +98,7 @@ internal fun SkyEpubViewer(
                 setScanListener(
                     listener = { max ->
                         currentOnGetTotalPagesChanged.invoke(max)
+                        currentOnLoadingStateChange.invoke(false)
                     },
                     getNavListener = {
                         onGetNavList.invoke(it)

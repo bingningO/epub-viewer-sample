@@ -1,5 +1,6 @@
 package com.bing.epublib.ui.skyEpub
 
+import androidx.compose.runtime.getValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bing.epublib.epubDomain.EpubFileHandler
@@ -31,16 +32,20 @@ class SkyEpubViewerViewModel @Inject constructor(
     private val _uiData = SkyEpubViewerContract.MutableUiData()
     override val uiState: UiState = object : UiState {
         override val uiData: UiData = _uiData
-        override val events: List<SkyEpubViewerEvent> = eventHandler.eventState
+        override val events: List<SkyEpubViewerEvent> by eventHandler.eventState
     }
 
     private val _onLoadingStateChanged = MutableSharedFlow<Boolean>()
     private val _onChangePagePosition = MutableSharedFlow<Double>()
+    private val _onClickFontSizeBigger = MutableSharedFlow<Unit>()
+    private val _onClickFontSizeSmaller = MutableSharedFlow<Unit>()
 
     override val uiInput: UiInput = object : UiInput {
         override val onEventConsumed = eventHandler.onEventConsumed
         override val onLoadingStateChanged = _onLoadingStateChanged
         override val onChangePagePosition = _onChangePagePosition
+        override val onClickFontSizeBigger = _onClickFontSizeBigger
+        override val onClickFontSizeSmaller = _onClickFontSizeSmaller
     }
 
     // change the book name here to open different book file(also they need to be copied to assets dir)
@@ -111,5 +116,42 @@ class SkyEpubViewerViewModel @Inject constructor(
                 )
             }
         }.launchIn(viewModelScope)
+
+        _onClickFontSizeSmaller.onEach {
+            setFontSize(_uiData.fontSizeIndex - 1)
+        }.launchIn(viewModelScope)
+        _onClickFontSizeBigger.onEach {
+            setFontSize(_uiData.fontSizeIndex + 1)
+        }.launchIn(viewModelScope)
+    }
+
+    private fun setFontSize(fontSizeIndexToChange: Int) {
+        var rs = when (fontSizeIndexToChange) {
+            -5 -> {
+                eventHandler.scheduleEvent(SkyEpubViewerEvent.ShowToast("Already the smallest font size"))
+                return
+            }
+
+            -4 -> 10
+            -3 -> 14
+            -2 -> 17
+            -1 -> 20
+
+            0 -> 24
+            1 -> 27
+            2 -> 30
+            3 -> 34
+            4 -> 37
+            else -> {
+                eventHandler.scheduleEvent(SkyEpubViewerEvent.ShowToast("Already the smallest font size"))
+                return
+            }
+        }
+        rs = (rs.toDouble() * 0.75f).toInt()
+        if (fontSizeIndexToChange in -4..4) {
+            _uiData.fontSizeIndex = fontSizeIndexToChange
+            _uiData.realFontSize = rs
+        }
+        Timber.v("epub log setFontSize: ${_uiData.realFontSize}, ${_uiData.fontSizeIndex}")
     }
 }

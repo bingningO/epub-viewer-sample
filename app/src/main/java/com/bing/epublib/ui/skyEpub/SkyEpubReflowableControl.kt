@@ -20,9 +20,11 @@ import timber.log.Timber
 /**
  * custom viewer extending SkyEpub SDK#ReflowableControl
  */
-class SkyEpubReflowableControl(context: Context, bookCode: Int) : ReflowableControl(context) {
+class SkyEpubReflowableControl(context: Context, bookCode: Int, fontSize: Int) :
+    ReflowableControl(context) {
 
     private val savedPagingInformation = arrayListOf<PagingInformation>()
+    private var currentState = State.NORMAL
 
     init {
         setForegroundColor(Color.White.toArgb())
@@ -33,6 +35,7 @@ class SkyEpubReflowableControl(context: Context, bookCode: Int) : ReflowableCont
         adjustContentWidth(true)
         // set the bookCode to identify the book file.
         setBookCode(bookCode)
+        setFont(FONT_SIZE_NAME, fontSize)
 
         // if true, globalPagination will be activated.
         // this enables the calculation of page number based on entire book ,not on each chapter.
@@ -44,12 +47,19 @@ class SkyEpubReflowableControl(context: Context, bookCode: Int) : ReflowableCont
 
     fun setLoadingListener(listener: (isLoading: Boolean) -> Unit) {
         setStateListener { state ->
+            Timber.v("epub log viewer state: $state")
+            currentState = state
             val isLoading = when (state) {
                 State.LOADING, State.BUSY -> true
                 else -> false
             }
             listener.invoke(isLoading)
         }
+    }
+
+    fun setFontSizeIfNotLoading(realFontSize: Int) {
+        if (currentState != State.NORMAL) return
+        changeFont(FONT_SIZE_NAME, realFontSize)
     }
 
     private fun getNavData(): List<ViewerIndexData<NavPoint>> {
@@ -212,5 +222,9 @@ class SkyEpubReflowableControl(context: Context, bookCode: Int) : ReflowableCont
             }
 
         })
+    }
+
+    companion object {
+        private const val FONT_SIZE_NAME = "fontSize"
     }
 }

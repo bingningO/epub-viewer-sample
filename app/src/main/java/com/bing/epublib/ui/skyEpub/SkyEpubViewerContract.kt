@@ -27,6 +27,8 @@ class SkyEpubViewerContract {
         val onEventConsumed: FlowCollector<SkyEpubViewerEvent>
         val onLoadingStateChanged: FlowCollector<Boolean>
         val onChangePagePosition: FlowCollector<Double>
+        val onClickFontSizeBigger: FlowCollector<Unit>
+        val onClickFontSizeSmaller: FlowCollector<Unit>
     }
 
     @Stable
@@ -38,6 +40,8 @@ class SkyEpubViewerContract {
         val bookPath: String
         val bookCode: Int
         val isFixedLayout: Boolean
+        val realFontSize: Int
+        val fontSizeIndex: Int
     }
 
     @Stable
@@ -59,10 +63,12 @@ class SkyEpubViewerContract {
         override var bookCode: Int by mutableStateOf(0)
         override var bookProvider: SkyProvider? by mutableStateOf(null)
         override var isFixedLayout: Boolean by mutableStateOf(false)
+        override var realFontSize: Int by mutableStateOf(0)
+        override var fontSizeIndex: Int by mutableStateOf(0)
     }
 
     @Immutable
     sealed class SkyEpubViewerEvent : UIEvent() {
-
+        data class ShowToast(val message: String) : SkyEpubViewerEvent()
     }
 }

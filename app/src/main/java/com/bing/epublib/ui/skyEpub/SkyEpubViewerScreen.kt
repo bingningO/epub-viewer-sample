@@ -2,6 +2,7 @@
 
 package com.bing.epublib.ui.skyEpub
 
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -18,26 +19,36 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.bing.epublib.model.FontSize
 import com.bing.epublib.ui.common.composable.ErrorScreen
 import com.bing.epublib.ui.common.composable.LoadingScreen
 import com.bing.epublib.ui.common.viewer.ViewerIndexData
 import com.bing.epublib.ui.common.viewer.ViewerTopContent
+import com.bing.epublib.ui.skyEpub.SkyEpubViewerContract.SkyEpubViewerEvent.ShowToast
 import com.bing.epublib.ui.skyEpub.SkyEpubViewerContract.UiData
 import com.skytree.epub.NavPoint
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @Composable
 fun SkyEpubViewerScreen(
     viewModel: SkyEpubViewerContract.ViewModel = hiltViewModel<SkyEpubViewerViewModel>(),
     onCloseClick: () -> Unit
 ) {
+    val context = LocalContext.current
     val uiState = viewModel.uiState
     val uiInput = viewModel.uiInput
 
     uiState.events.firstOrNull()?.let { event ->
         LaunchedEffect(event.id) {
-            // todo when(event)
+            Timber.v("epub log event: $event")
+            when (event) {
+                is ShowToast -> {
+                    Toast.makeText(context, event.message, Toast.LENGTH_LONG).show()
+                }
+            }
             uiInput.onEventConsumed.emit(event)
         }
     }
@@ -158,7 +169,15 @@ private fun SkyEpubViewerSuccessContent(
                 navChangeRequestByToc = it
             },
             onFontSizeSelected = {
-                // todo
+                when (it) {
+                    FontSize.BIGGER -> {
+                        scope.launch { uiInput.onClickFontSizeBigger.emit(Unit) }
+                    }
+
+                    FontSize.SMALLER -> {
+                        scope.launch { uiInput.onClickFontSizeSmaller.emit(Unit) }
+                    }
+                }
             }
         )
     }
