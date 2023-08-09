@@ -64,9 +64,8 @@ fun SlidePanel(
                 ) {
                     Icon(
                         modifier = modifier
-                            .size(dimensionResource(R.dimen.ui_common_app_bar_height))
-                            .padding(12.dp),
-                        painter = painterResource(R.drawable.ui_common_ic_mirai_ui_close),
+                            .size(dimensionResource(R.dimen.ui_common_app_bar_height)),
+                        painter = painterResource(R.drawable.ic_close),
                         contentDescription = "Close",
                     )
                 }

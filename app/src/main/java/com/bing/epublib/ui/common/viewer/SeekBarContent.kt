@@ -139,8 +139,8 @@ private fun ViewerControllerTopBar(
                 modifier = modifier
                     .align(Alignment.TopStart)
                     .size(dimensionResource(R.dimen.ui_common_app_bar_height))
-                    .padding(12.dp),
-                painter = painterResource(R.drawable.ui_common_ic_mirai_ui_close),
+                    .padding(4.dp),
+                painter = painterResource(R.drawable.ic_close),
                 contentDescription = "Close",
             )
         }
@@ -156,8 +156,8 @@ private fun ViewerControllerTopBar(
                 Icon(
                     modifier = modifier
                         .size(dimensionResource(R.dimen.ui_common_app_bar_height))
-                        .padding(8.dp),
-                    painter = painterResource(R.drawable.book_viewer_ic_book_index),
+                        .padding(4.dp),
+                    painter = painterResource(R.drawable.ic_index),
                     contentDescription = "table of content",
                 )
             }
