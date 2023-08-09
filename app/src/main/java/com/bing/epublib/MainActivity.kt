@@ -28,10 +28,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     addHomeTopLevel(navController)
                     addSkyEpubViewerTopLevel(
-                        navController,
-                        onCloseClick = {
-                            finish()
-                        }
+                        navController
                     )
                 }
             }

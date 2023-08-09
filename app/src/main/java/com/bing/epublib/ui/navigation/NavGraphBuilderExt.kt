@@ -20,9 +20,10 @@ fun NavGraphBuilder.addHomeTopLevel(
 
 fun NavGraphBuilder.addSkyEpubViewerTopLevel(
     navController: NavController,
-    onCloseClick: () -> Unit
 ) {
     composable(ScreenRoutes.SkyEpubViewer.route) {
-        SkyEpubViewerScreen(onCloseClick = onCloseClick)
+        SkyEpubViewerScreen(onCloseClick = {
+            navController.popBackStack()
+        })
     }
 }
