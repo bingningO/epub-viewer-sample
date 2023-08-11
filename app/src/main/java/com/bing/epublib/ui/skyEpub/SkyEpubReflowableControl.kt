@@ -153,7 +153,7 @@ class SkyEpubReflowableControl(context: Context, bookCode: Int, fontSize: Int) :
 
 
     fun setScanListener(
-        listener: (totalPage: Int) -> Unit,
+        scanFinishedListener: (totalPage: Int) -> Unit,
         getNavListener: (List<ViewerIndexData<NavPoint>>) -> Unit
     ) {
         // set the pagingListener which is called when GlobalPagination is true.
@@ -192,7 +192,7 @@ class SkyEpubReflowableControl(context: Context, bookCode: Int, fontSize: Int) :
             }
 
             override fun onScanFinished(p0: Int) {
-                listener.invoke(numberOfPagesInBook)
+                scanFinishedListener.invoke(numberOfPagesInBook)
                 getNavListener.invoke(getNavData())
             }
 

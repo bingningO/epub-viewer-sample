@@ -20,7 +20,6 @@ import com.skytree.epub.SkyActivityState
 import timber.log.Timber
 import java.lang.ref.WeakReference
 
-// todo need separate reflowable and fixed viewer
 @Composable
 internal fun SkyEpubViewer(
     modifier: Modifier = Modifier,
@@ -44,6 +43,7 @@ internal fun SkyEpubViewer(
     val currentOnPageChanged by rememberUpdatedState(newValue = onPageChanged)
     val currentOnGetTotalPagesChanged by rememberUpdatedState(newValue = onGetTotalPages)
     var maxIndex by remember { mutableStateOf(0) }
+    var isInitLoading by remember { mutableStateOf(false) }
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
@@ -52,16 +52,10 @@ internal fun SkyEpubViewer(
                 Lifecycle.Event.ON_START -> viewerRef.get()?.activityState =
                     SkyActivityState.Started
 
-                Lifecycle.Event.ON_STOP -> {
-                    Timber.v("epub log viewer stop")
-                    viewerRef.get()?.activityState = SkyActivityState.Stopped
-                }
+                Lifecycle.Event.ON_STOP -> viewerRef.get()?.activityState = SkyActivityState.Stopped
 
                 Lifecycle.Event.ON_DESTROY -> viewerRef.get()?.destroy()
-                Lifecycle.Event.ON_PAUSE -> {
-                    Timber.v("epub log viewer pause")
-                    viewerRef.get()?.activityState = SkyActivityState.Paused
-                }
+                Lifecycle.Event.ON_PAUSE -> viewerRef.get()?.activityState = SkyActivityState.Paused
 
                 Lifecycle.Event.ON_RESUME -> viewerRef.get()?.activityState =
                     SkyActivityState.Resumed
@@ -85,6 +79,7 @@ internal fun SkyEpubViewer(
         modifier = modifier,
         factory = { factoryContext ->
             Timber.v("epub log viewer factory, ${uiData.initialPositionInBook}")
+            isInitLoading = true
             currentOnLoadingStateChange.invoke(true)
             SkyEpubReflowableControl(factoryContext, uiData.bookCode, uiData.realFontSize).apply {
                 viewerRef = WeakReference(this)
@@ -96,8 +91,9 @@ internal fun SkyEpubViewer(
 
                 // setListener, must call this to get totalPages by analysis global pagingInfo
                 setScanListener(
-                    listener = { max ->
+                    scanFinishedListener = { max ->
                         currentOnGetTotalPagesChanged.invoke(max)
+                        isInitLoading = false
                         currentOnLoadingStateChange.invoke(false)
                     },
                     getNavListener = {
@@ -105,7 +101,9 @@ internal fun SkyEpubViewer(
                     }
                 )
                 setLoadingListener {
-                    currentOnLoadingStateChange.invoke(it)
+                    if (isInitLoading.not()) {
+                        currentOnLoadingStateChange.invoke(it)
+                    }
                 }
                 setOnPageMovedListener { info ->
                     maxIndex = info.totalPage
