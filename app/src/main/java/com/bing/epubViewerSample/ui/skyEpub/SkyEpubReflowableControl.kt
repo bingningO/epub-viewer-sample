@@ -12,6 +12,7 @@ import com.skytree.epub.PageMovedListener
 import com.skytree.epub.PageTransition
 import com.skytree.epub.PagingInformation
 import com.skytree.epub.PagingListener
+import com.skytree.epub.PagingMode
 import com.skytree.epub.ReflowableControl
 import com.skytree.epub.State
 import timber.log.Timber
@@ -42,6 +43,7 @@ class SkyEpubReflowableControl(context: Context, bookCode: Int, fontSize: Int) :
         // AVOID GLOBAL PAGINATION FOR LOW SPEC DEVICES.
         // set it as true for getting page number of entire book.
         isGlobalPagination = true
+        setPagingMode(PagingMode.PAGING_SCAN)
     }
 
     fun setLoadingListener(listener: (isLoading: Boolean) -> Unit) {
@@ -183,7 +185,7 @@ class SkyEpubReflowableControl(context: Context, bookCode: Int, fontSize: Int) :
             }
 
             override fun onScanStarted(p0: Int) {
-                // do nothing
+                Timber.v("epub log onScanStarted: $p0")
             }
 
             override fun onScanned(p0: ItemRef?) {
@@ -191,6 +193,7 @@ class SkyEpubReflowableControl(context: Context, bookCode: Int, fontSize: Int) :
             }
 
             override fun onScanFinished(p0: Int) {
+                Timber.v("epub log onScanFinished: $p0, $numberOfPagesInBook")
                 scanFinishedListener.invoke(numberOfPagesInBook)
                 getNavListener.invoke(getNavData())
             }

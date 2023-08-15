@@ -31,9 +31,12 @@ internal fun SkyEpubViewer(
     var viewerRef by remember {
         mutableStateOf(WeakReference<SkyEpubReflowableControl>(null))
     }
+    var isInitLoading by remember { mutableStateOf(false) }
+
+    // always read the updated value if called inside AndroidView#factory
     val currentOnLoadingStateChange by rememberUpdatedState(onLoadingStateChange)
     val currentOnPageChanged by rememberUpdatedState(newValue = onPageChanged)
-    var isInitLoading by remember { mutableStateOf(false) }
+    val currentUiState by rememberUpdatedState(newValue = skyEpubViewerUiState)
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
@@ -82,12 +85,12 @@ internal fun SkyEpubViewer(
                 // setListener, must call this to get totalPages by analysis global pagingInfo
                 setScanListener(
                     scanFinishedListener = { max ->
-                        skyEpubViewerUiState.seekBarState.totalPage = max
+                        currentUiState.seekBarState.totalPage = max
                         isInitLoading = false
                         currentOnLoadingStateChange.invoke(false)
                     },
                     getNavListener = {
-                        skyEpubViewerUiState.bookIndexState.onIndexDataInitialized(it)
+                        currentUiState.bookIndexState.onIndexDataInitialized(it)
                     }
                 )
                 setLoadingListener {
@@ -99,7 +102,7 @@ internal fun SkyEpubViewer(
                     currentOnPageChanged.invoke(info)
                 }
                 setOnScreenClicked {
-                    skyEpubViewerUiState.setShowTopContent(true)
+                    currentUiState.setShowTopContent(true)
                 }
 
             }
