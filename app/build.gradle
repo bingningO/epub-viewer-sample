@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace 'com.bing.epublib'
+    namespace 'com.bing.epubViewerSample'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.bing.epublib"
+        applicationId "com.bing.epubViewerSample"
         minSdk 24
         targetSdk 33
         versionCode 1

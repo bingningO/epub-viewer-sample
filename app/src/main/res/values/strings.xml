@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">EpubLib</string>
+    <string name="app_name">Epub Viewer Sample</string>
 
     <string name="table_of_content">TOC</string>
 
