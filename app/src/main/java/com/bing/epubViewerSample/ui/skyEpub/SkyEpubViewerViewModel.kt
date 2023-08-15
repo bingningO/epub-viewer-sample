@@ -144,7 +144,7 @@ class SkyEpubViewerViewModel @Inject constructor(
             3 -> 34
             4 -> 37
             else -> {
-                eventHandler.scheduleEvent(SkyEpubViewerEvent.ShowToast("Already the smallest font size"))
+                eventHandler.scheduleEvent(SkyEpubViewerEvent.ShowToast("Already the biggest font size"))
                 return
             }
         }

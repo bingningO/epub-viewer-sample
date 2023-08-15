@@ -63,7 +63,7 @@ internal fun SkyEpubViewer(
             lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
-
+    
     LaunchedEffect(uiData.realFontSize) {
         viewerRef.get()?.setFontSizeIfNotLoading(uiData.realFontSize)
     }
@@ -125,6 +125,6 @@ internal fun SkyEpubViewer(
                     skyEpubViewerUiState.bookIndexState.onIndexJumpConsumed()
                 }
             }
-        }
+        },
     )
 }
