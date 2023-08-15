@@ -21,7 +21,7 @@ class SkyEpubViewerUiState<T>(
         get() = _isTOCVisible
 
     fun onBookIndexClicked(index: T) {
-        bookIndexState.onSelectedIndex = index
+        bookIndexState.onIndexClicked(index)
         _isTOCVisible = false
     }
 
@@ -76,15 +76,23 @@ fun rememberSeekBarState() = remember { SeekBarState() }
 
 @Stable
 class BookIndexState<T> {
-    var indexList by mutableStateOf(listOf<ViewerIndexData<T>>())
-    var onSelectedIndex by mutableStateOf<T?>(null)
+    private var _indexList by mutableStateOf(listOf<ViewerIndexData<T>>())
+    private var _onSelectedIndex by mutableStateOf<T?>(null)
+    val indexList: List<ViewerIndexData<T>>
+        get() = _indexList
+    val onSelectedIndex: T?
+        get() = _onSelectedIndex
+
+    fun onIndexClicked(index: T) {
+        _onSelectedIndex = index
+    }
 
     fun onIndexDataInitialized(index: List<ViewerIndexData<T>>) {
-        indexList = index
+        _indexList = index
     }
 
     fun onIndexJumpConsumed() {
-        onSelectedIndex = null
+        _onSelectedIndex = null
     }
 }
 
