@@ -1,1 +1,1 @@
-# epub-lab
+# epub-viewer-sample
