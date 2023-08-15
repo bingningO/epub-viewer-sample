@@ -22,10 +22,12 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.bing.epublib.R
-import com.bing.epublib.model.FontSize
-import com.bing.epublib.ui.theme.EpubLibTheme
-import com.bing.epublib.ui.theme.Paddings
+import com.bing.epubViewerSample.R
+import com.bing.epubViewerSample.model.FontSize
+import com.bing.epubViewerSample.ui.skyEpub.SeekBarState
+import com.bing.epubViewerSample.ui.skyEpub.rememberSeekBarState
+import com.bing.epubViewerSample.ui.theme.Paddings
+import com.bing.epubViewerSample.ui.theme.epubViewerSampleTheme
 
 /**
  * @param onChangeSeekbarProgressFinish 0f ~ 1f
@@ -33,13 +35,11 @@ import com.bing.epublib.ui.theme.Paddings
 @Composable
 fun SeekBarContent(
     modifier: Modifier = Modifier,
-    currentIndex: Int,
-    totalPage: Int,
-    onChangeSeekbarProgressFinish: (globalIndex: Int) -> Unit,
     onClick: () -> Unit,
     onCloseClick: () -> Unit,
     onIndexClick: () -> Unit,
     onFontSizeSelected: (FontSize) -> Unit,
+    seekBarState: SeekBarState,
 ) {
 
     Box(
@@ -62,9 +62,11 @@ fun SeekBarContent(
         ) {
             ViewerControllerSeekbarWithPageIndexText(
                 modifier = Modifier.fillMaxWidth(),
-                currentIndex = currentIndex,
-                totalPage = totalPage,
-                onChangeSeekbarProgressFinish = onChangeSeekbarProgressFinish
+                currentIndex = seekBarState.currentIndex,
+                totalPage = seekBarState.totalPage,
+                onChangeSeekbarProgressFinish = {
+                    seekBarState.onProgressChangeRequest(it)
+                }
             )
 
             SettingButtonWithPopup(
@@ -168,11 +170,11 @@ private fun ViewerControllerTopBar(
 @Preview
 @Composable
 private fun SeekBarContentPreview() {
-    EpubLibTheme {
+    epubViewerSampleTheme {
         SeekBarContent(
-            currentIndex = 12,
-            totalPage = 60,
-            onChangeSeekbarProgressFinish = {},
+            seekBarState = rememberSeekBarState().apply {
+                onPageInfoChanged(10, 120)
+            },
             onClick = {},
             onCloseClick = {},
             onIndexClick = {},

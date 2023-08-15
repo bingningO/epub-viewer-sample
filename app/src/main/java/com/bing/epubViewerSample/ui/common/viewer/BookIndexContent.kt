@@ -17,14 +17,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.bing.epublib.ui.theme.EpubLibTheme
-import com.bing.epublib.ui.theme.Paddings
+import com.bing.epubViewerSample.ui.skyEpub.BookIndexState
+import com.bing.epubViewerSample.ui.skyEpub.rememberBookIndexState
+import com.bing.epubViewerSample.ui.theme.Paddings
+import com.bing.epubViewerSample.ui.theme.epubViewerSampleTheme
 
 @Composable
 internal fun <T> EpubViewerBookIndexContent(
     modifier: Modifier = Modifier,
-    indexList: List<ViewerIndexData<T>>,
-    onSelectPageIndex: (T) -> Unit
+    bookIndexState: BookIndexState<T>,
+    onIndexClicked: (T) -> Unit,
 ) {
     LazyColumn(
         modifier = modifier.fillMaxWidth(),
@@ -35,7 +37,7 @@ internal fun <T> EpubViewerBookIndexContent(
         )
     ) {
         itemsIndexed(
-            items = indexList,
+            items = bookIndexState.indexList,
             key = { index, item -> "${index}_${item.pageData.hashCode()}" }
         ) { _, indexData ->
             val displayTitle = buildString {
@@ -47,7 +49,7 @@ internal fun <T> EpubViewerBookIndexContent(
             Text(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { onSelectPageIndex.invoke(indexData.pageData) }
+                    .clickable { onIndexClicked(indexData.pageData) }
                     .padding(horizontal = 20.dp, vertical = Paddings.x075),
                 text = displayTitle,
                 style = MaterialTheme.typography.bodyMedium,
@@ -82,10 +84,13 @@ private fun EpubViewerBookIndexContentPreview() {
             )
         }
     }
-    EpubLibTheme() {
+    val bookIndexState = rememberBookIndexState<String>().apply {
+        onIndexDataInitialized(dummyList)
+    }
+    epubViewerSampleTheme() {
         EpubViewerBookIndexContent<String>(
-            indexList = dummyList,
-            onSelectPageIndex = {}
+            bookIndexState = bookIndexState,
+            onIndexClicked = { }
         )
     }
 }

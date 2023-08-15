@@ -3,8 +3,8 @@ package com.bing.epubViewerSample.ui.navigation
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.bing.epublib.ui.home.HomeScreen
-import com.bing.epublib.ui.skyEpub.SkyEpubViewerScreen
+import com.bing.epubViewerSample.ui.home.HomeScreen
+import com.bing.epubViewerSample.ui.skyEpub.SkyEpubViewerScreen
 
 fun NavGraphBuilder.addHomeTopLevel(
     navController: NavController

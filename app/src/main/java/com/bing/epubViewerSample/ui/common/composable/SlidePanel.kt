@@ -27,9 +27,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
-import com.bing.epublib.R
-import com.bing.epublib.ui.theme.EpubLibTheme
-import com.bing.epublib.ui.theme.Paddings
+import com.bing.epubViewerSample.R
+import com.bing.epubViewerSample.ui.theme.epubViewerSampleTheme
+import com.bing.epubViewerSample.ui.theme.Paddings
 
 @Composable
 fun SlidePanel(
@@ -84,7 +84,7 @@ fun SlidePanel(
 @Preview(device = Devices.PIXEL_4)
 @Composable
 fun PreviewSlidePanel() {
-    EpubLibTheme {
+    epubViewerSampleTheme {
         SlidePanel(
             title = "Title",
             onCloseClick = {},

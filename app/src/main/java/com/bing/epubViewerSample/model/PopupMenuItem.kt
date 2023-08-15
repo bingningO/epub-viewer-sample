@@ -1,7 +1,7 @@
 package com.bing.epubViewerSample.model
 
 import androidx.compose.runtime.Stable
-import com.bing.epublib.R
+import com.bing.epubViewerSample.R
 
 @Stable
 interface PopupMenuItem {

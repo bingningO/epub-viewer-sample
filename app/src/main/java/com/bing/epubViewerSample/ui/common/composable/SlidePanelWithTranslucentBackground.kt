@@ -14,7 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.bing.epublib.ui.theme.EpubLibTheme
+import com.bing.epubViewerSample.ui.theme.epubViewerSampleTheme
 
 @Composable
 fun SlidePanelWithTranslucentBackground(
@@ -57,7 +57,7 @@ fun SlidePanelWithTranslucentBackground(
 @Preview
 @Composable
 fun PreviewSlidePanelWithTranslucentBackground() {
-    EpubLibTheme {
+    epubViewerSampleTheme {
         SlidePanelWithTranslucentBackground(
             isVisible = true,
             title = "Title",

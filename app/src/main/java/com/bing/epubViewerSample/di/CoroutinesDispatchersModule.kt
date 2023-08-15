@@ -1,9 +1,9 @@
 package com.bing.epubViewerSample.di
 
-import com.bing.epublib.ui.common.DefaultDispatcher
-import com.bing.epublib.ui.common.IoDispatcher
-import com.bing.epublib.ui.common.MainDispatcher
-import com.bing.epublib.ui.common.MainImmediateDispatcher
+import com.bing.epubViewerSample.ui.common.DefaultDispatcher
+import com.bing.epubViewerSample.ui.common.IoDispatcher
+import com.bing.epubViewerSample.ui.common.MainDispatcher
+import com.bing.epubViewerSample.ui.common.MainImmediateDispatcher
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

@@ -10,8 +10,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.bing.epublib.model.FontSize
-import com.bing.epublib.model.PopupMenuItem
+import com.bing.epubViewerSample.model.FontSize
+import com.bing.epubViewerSample.model.PopupMenuItem
 
 @Composable
 fun <T> PopupMenu(

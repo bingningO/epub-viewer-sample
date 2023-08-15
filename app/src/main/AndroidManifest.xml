@@ -23,7 +23,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.EpubLib"
+        android:theme="@style/Theme.epubViewerSample"
         android:requestLegacyExternalStorage="true"
         android:networkSecurityConfig="@xml/network_security"
         tools:targetApi="31">
@@ -31,7 +31,8 @@
             android:name=".MainActivity"
             android:exported="true"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
-            android:theme="@style/Theme.EpubLib">
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.epubViewerSample">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -3,15 +3,16 @@ package com.bing.epubViewerSample.ui.skyEpub
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.bing.epublib.epubDomain.EpubFileHandler
-import com.bing.epublib.epubDomain.EpubFileReader
-import com.bing.epublib.model.EpubInfo
-import com.bing.epublib.repository.EpubInfoRepository
-import com.bing.epublib.ui.common.UIEventHandler
-import com.bing.epublib.ui.skyEpub.SkyEpubViewerContract.SkyEpubViewerEvent
-import com.bing.epublib.ui.skyEpub.SkyEpubViewerContract.UiData
-import com.bing.epublib.ui.skyEpub.SkyEpubViewerContract.UiInput
-import com.bing.epublib.ui.skyEpub.SkyEpubViewerContract.UiState
+import com.bing.epubViewerSample.epubDomain.EpubFileHandler
+import com.bing.epubViewerSample.epubDomain.EpubFileReader
+import com.bing.epubViewerSample.model.EpubInfo
+import com.bing.epubViewerSample.repository.EpubInfoRepository
+import com.bing.epubViewerSample.ui.common.UIEventHandler
+import com.bing.epubViewerSample.ui.skyEpub.SkyEpubViewerContract.MutableUiData
+import com.bing.epubViewerSample.ui.skyEpub.SkyEpubViewerContract.SkyEpubViewerEvent
+import com.bing.epubViewerSample.ui.skyEpub.SkyEpubViewerContract.UiData
+import com.bing.epubViewerSample.ui.skyEpub.SkyEpubViewerContract.UiInput
+import com.bing.epubViewerSample.ui.skyEpub.SkyEpubViewerContract.UiState
 import com.skytree.epub.SkyProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -29,7 +30,7 @@ class SkyEpubViewerViewModel @Inject constructor(
 ) : ViewModel(), SkyEpubViewerContract.ViewModel {
 
     private val eventHandler = UIEventHandler<SkyEpubViewerEvent>(viewModelScope)
-    private val _uiData = SkyEpubViewerContract.MutableUiData()
+    private val _uiData = MutableUiData()
     override val uiState: UiState = object : UiState {
         override val uiData: UiData = _uiData
         override val events: List<SkyEpubViewerEvent> by eventHandler.eventState

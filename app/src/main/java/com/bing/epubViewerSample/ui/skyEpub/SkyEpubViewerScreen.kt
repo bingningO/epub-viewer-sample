@@ -13,28 +13,22 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.bing.epublib.model.FontSize
-import com.bing.epublib.ui.common.composable.ErrorScreen
-import com.bing.epublib.ui.common.composable.LoadingScreen
-import com.bing.epublib.ui.common.viewer.ViewerIndexData
-import com.bing.epublib.ui.common.viewer.ViewerTopContent
-import com.bing.epublib.ui.skyEpub.SkyEpubViewerContract.SkyEpubViewerEvent.ShowToast
-import com.bing.epublib.ui.skyEpub.SkyEpubViewerContract.UiData
+import com.bing.epubViewerSample.model.FontSize.*
+import com.bing.epubViewerSample.ui.common.composable.ErrorScreen
+import com.bing.epubViewerSample.ui.common.composable.LoadingScreen
+import com.bing.epubViewerSample.ui.common.viewer.ViewerTopContent
+import com.bing.epubViewerSample.ui.skyEpub.SkyEpubViewerContract.*
 import com.skytree.epub.NavPoint
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @Composable
 fun SkyEpubViewerScreen(
-    viewModel: SkyEpubViewerContract.ViewModel = hiltViewModel<SkyEpubViewerViewModel>(),
+    viewModel: ViewModel = hiltViewModel<SkyEpubViewerViewModel>(),
     onCloseClick: () -> Unit
 ) {
     val context = LocalContext.current
@@ -45,7 +39,7 @@ fun SkyEpubViewerScreen(
         LaunchedEffect(event.id) {
             Timber.v("epub log event: $event")
             when (event) {
-                is ShowToast -> {
+                is SkyEpubViewerEvent.ShowToast -> {
                     Toast.makeText(context, event.message, Toast.LENGTH_LONG).show()
                 }
             }
@@ -62,7 +56,7 @@ fun SkyEpubViewerScreen(
 @Composable
 private fun SkyEpubViewerContent(
     uiData: UiData,
-    uiInput: SkyEpubViewerContract.UiInput,
+    uiInput: UiInput,
     onCloseClick: () -> Unit
 ) {
     when {
@@ -88,32 +82,15 @@ private fun SkyEpubViewerContent(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun SkyEpubViewerSuccessContent(
     uiData: UiData,
-    uiInput: SkyEpubViewerContract.UiInput,
+    uiInput: UiInput,
     onCloseClick: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    var isShowTopContent by remember { mutableStateOf(false) }
-    var maxIndexFromViewerSDK: Int by remember { mutableStateOf(0) }
-    var currentGlobalIndexFromViewerSDK: Int by remember(
-        uiData.initialPositionInBook,
-        maxIndexFromViewerSDK
-    ) {
-        mutableStateOf(
-            if (maxIndexFromViewerSDK != 0) {
-                (uiData.initialPositionInBook * maxIndexFromViewerSDK).toInt()
-            } else {
-                0
-            }
-        )
-    }
-    var progressChangeRequestByController: Int? by remember { mutableStateOf(null) }
-    var navChangeRequestByToc: NavPoint? by remember { mutableStateOf(null) }
-    var navListData: List<ViewerIndexData<NavPoint>> by remember {
-        mutableStateOf(emptyList())
-    }
+    val skyEpubViewerUiState = rememberSkyEpubViewerUiState<NavPoint>()
 
     CompositionLocalProvider(
         LocalOverscrollConfiguration provides null,
@@ -123,58 +100,37 @@ private fun SkyEpubViewerSuccessContent(
             onLoadingStateChange = {
                 scope.launch { uiInput.onLoadingStateChanged.emit(it) }
             },
-            requestJumpGlobalIndexProgress = progressChangeRequestByController,
-            requestJumpNav = navChangeRequestByToc,
-            onTap = {
-                isShowTopContent = true
-            },
             onPageChanged = {
-                maxIndexFromViewerSDK = it.totalPage
-                currentGlobalIndexFromViewerSDK = it.currentIndexInBook
+                skyEpubViewerUiState.seekBarState.onPageInfoChanged(
+                    it.currentIndexInBook,
+                    it.totalPage
+                )
                 scope.launch {
                     uiInput.onChangePagePosition.emit(it.currentPositionInBook)
                 }
             },
-            onGetTotalPages = {
-                maxIndexFromViewerSDK = it
-            },
-            onRequestJumpFinished = {
-                progressChangeRequestByController = null
-                navChangeRequestByToc = null
-            },
-            onGetNavList = {
-                navListData = it
-            },
+            skyEpubViewerUiState = skyEpubViewerUiState,
         )
     }
 
     AnimatedVisibility(
-        visible = isShowTopContent,
+        visible = skyEpubViewerUiState.isShowTopContent,
         enter = fadeIn(),
         exit = fadeOut()
     ) {
-        ViewerTopContent<NavPoint>(
-            currentIndex = currentGlobalIndexFromViewerSDK,
-            totalPage = maxIndexFromViewerSDK,
-            onChangeSeekbarProgressFinish = {
-                progressChangeRequestByController = it
-            },
+        ViewerTopContent(
             onClick = {
-                isShowTopContent = false
+                skyEpubViewerUiState.setShowTopContent(false)
             },
             onCloseClick = onCloseClick,
-            navList = navListData,
-            onNavItemClick = {
-                isShowTopContent = false
-                navChangeRequestByToc = it
-            },
+            skyEpubViewerUiState = skyEpubViewerUiState,
             onFontSizeSelected = {
                 when (it) {
-                    FontSize.BIGGER -> {
+                    BIGGER -> {
                         scope.launch { uiInput.onClickFontSizeBigger.emit(Unit) }
                     }
 
-                    FontSize.SMALLER -> {
+                    SMALLER -> {
                         scope.launch { uiInput.onClickFontSizeSmaller.emit(Unit) }
                     }
                 }

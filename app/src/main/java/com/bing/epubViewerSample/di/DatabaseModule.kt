@@ -1,8 +1,8 @@
 package com.bing.epubViewerSample.di
 
 import android.content.Context
-import com.bing.epublib.data.EpubInfoDao
-import com.bing.epublib.data.EpubInfoDatabase
+import com.bing.epubViewerSample.data.EpubInfoDao
+import com.bing.epubViewerSample.data.EpubInfoDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

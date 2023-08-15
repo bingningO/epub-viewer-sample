@@ -1,4 +1,4 @@
-package com.bing.epublib
+package com.bing.epubViewerSample
 
 import org.junit.Test
 
