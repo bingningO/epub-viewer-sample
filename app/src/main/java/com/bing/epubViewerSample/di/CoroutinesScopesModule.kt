@@ -1,6 +1,6 @@
 package com.bing.epubViewerSample.di
 
-import com.bing.epublib.ui.common.DefaultDispatcher
+import com.bing.epubViewerSample.ui.common.DefaultDispatcher
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

@@ -3,54 +3,43 @@ package com.bing.epubViewerSample.ui.common.viewer
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import com.bing.epublib.R
-import com.bing.epublib.model.FontSize
-import com.bing.epublib.ui.common.composable.SlidePanelWithTranslucentBackground
+import com.bing.epubViewerSample.R
+import com.bing.epubViewerSample.model.FontSize
+import com.bing.epubViewerSample.ui.common.composable.SlidePanelWithTranslucentBackground
+import com.bing.epubViewerSample.ui.skyEpub.SkyEpubViewerUiState
 
 @Composable
 fun <T> ViewerTopContent(
     modifier: Modifier = Modifier,
-    currentIndex: Int,
-    totalPage: Int,
-    onChangeSeekbarProgressFinish: (globalIndex: Int) -> Unit,
     onClick: () -> Unit,
     onCloseClick: () -> Unit,
-    navList: List<ViewerIndexData<T>>,
-    onNavItemClick: (T) -> Unit,
     onFontSizeSelected: (FontSize) -> Unit,
+    skyEpubViewerUiState: SkyEpubViewerUiState<T>,
 ) {
-    var isSlidePaneVisible by remember {
-        mutableStateOf(false)
-    }
-
     Box {
         SeekBarContent(
-            currentIndex = currentIndex,
-            totalPage = totalPage,
-            onChangeSeekbarProgressFinish = onChangeSeekbarProgressFinish,
+            seekBarState = skyEpubViewerUiState.seekBarState,
             onClick = onClick,
             onCloseClick = onCloseClick,
             onIndexClick = {
-                isSlidePaneVisible = true
+                skyEpubViewerUiState.setTocVisible(true)
             },
             onFontSizeSelected = onFontSizeSelected
         )
 
         SlidePanelWithTranslucentBackground(
             modifier = Modifier.fillMaxSize(),
-            isVisible = isSlidePaneVisible,
+            isVisible = skyEpubViewerUiState.isTOCVisible,
             title = stringResource(R.string.table_of_content),
-            onHide = { isSlidePaneVisible = false },
+            onHide = { skyEpubViewerUiState.setTocVisible(false) },
             content = {
                 EpubViewerBookIndexContent(
-                    indexList = navList,
-                    onSelectPageIndex = onNavItemClick
+                    bookIndexState = skyEpubViewerUiState.bookIndexState,
+                    onIndexClicked = {
+                        skyEpubViewerUiState.onBookIndexClicked(it)
+                    }
                 )
             },
         )

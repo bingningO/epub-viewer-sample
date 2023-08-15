@@ -1,7 +1,7 @@
 package com.bing.epubViewerSample.epubDomain
 
 import android.util.Xml
-import com.bing.epublib.ui.common.IoDispatcher
+import com.bing.epubViewerSample.ui.common.IoDispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import org.xmlpull.v1.XmlPullParser

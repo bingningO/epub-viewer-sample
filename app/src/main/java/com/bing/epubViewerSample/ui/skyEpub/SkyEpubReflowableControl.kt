@@ -3,8 +3,7 @@ package com.bing.epubViewerSample.ui.skyEpub
 import android.content.Context
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import com.bing.epublib.ui.common.viewer.ViewerIndexData
-import com.bing.epublib.ui.skyEpub.SkyEpubViewerContract.BookPagingInfo
+import com.bing.epubViewerSample.ui.common.viewer.ViewerIndexData
 import com.skytree.epub.ClickListener
 import com.skytree.epub.ItemRef
 import com.skytree.epub.NavPoint
@@ -79,14 +78,14 @@ class SkyEpubReflowableControl(context: Context, bookCode: Int, fontSize: Int) :
         return navList
     }
 
-    fun setOnPageMovedListener(listener: (BookPagingInfo) -> Unit) {
+    fun setOnPageMovedListener(listener: (SkyEpubViewerContract.BookPagingInfo) -> Unit) {
         setPageMovedListener(object : PageMovedListener {
 
             override fun onPageMoved(pi: PageInformation?) {
                 // be notice [totalPage] is changed during pagination
                 if (isPaging.not()) {
                     listener.invoke(
-                        BookPagingInfo(
+                        SkyEpubViewerContract.BookPagingInfo(
                             totalPageInChapter = pi?.numberOfPagesInChapter ?: 0,
                             currentIndexInChapter = pi?.pageIndex ?: 0,
                             currentIndexInBook = pi?.pageIndexInBook ?: 0,

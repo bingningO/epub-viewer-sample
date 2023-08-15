@@ -10,7 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.bing.epublib.ui.theme.EpubLibTheme
+import com.bing.epubViewerSample.ui.theme.epubViewerSampleTheme
 
 @Composable
 fun LoadingScreen() {
@@ -29,7 +29,7 @@ fun LoadingScreen() {
 @Preview
 @Composable
 private fun PreviewLoadingScreen() {
-    EpubLibTheme {
+    epubViewerSampleTheme {
         LoadingScreen()
     }
 }

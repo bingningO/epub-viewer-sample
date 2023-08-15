@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.bing.epublib.ui.theme.EpubLibTheme
+import com.bing.epubViewerSample.ui.theme.epubViewerSampleTheme
 
 @Composable
 fun ErrorScreen(error: Throwable) {
@@ -27,7 +27,7 @@ fun ErrorScreen(error: Throwable) {
 @Preview
 @Composable
 private fun PreviewErrorScreen() {
-    EpubLibTheme {
+    epubViewerSampleTheme {
         ErrorScreen(error = Throwable("Test error"))
     }
 }

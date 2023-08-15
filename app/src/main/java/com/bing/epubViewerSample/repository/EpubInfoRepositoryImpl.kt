@@ -1,11 +1,11 @@
 package com.bing.epubViewerSample.repository
 
-import com.bing.epublib.data.EpubInfoDao
-import com.bing.epublib.data.EpubInfoEntity
-import com.bing.epublib.di.ApplicationScope
-import com.bing.epublib.model.EpubInfo
-import com.bing.epublib.model.EpubSetting
-import com.bing.epublib.ui.common.IoDispatcher
+import com.bing.epubViewerSample.data.EpubInfoDao
+import com.bing.epubViewerSample.data.EpubInfoEntity
+import com.bing.epubViewerSample.di.ApplicationScope
+import com.bing.epubViewerSample.model.EpubInfo
+import com.bing.epubViewerSample.model.EpubSetting
+import com.bing.epubViewerSample.ui.common.IoDispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.withContext

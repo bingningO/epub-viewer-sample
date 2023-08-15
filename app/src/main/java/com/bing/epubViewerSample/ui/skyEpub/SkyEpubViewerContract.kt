@@ -6,7 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.DefaultLifecycleObserver
-import com.bing.epublib.ui.common.UIEvent
+import com.bing.epubViewerSample.ui.common.UIEvent
 import com.skytree.epub.SkyProvider
 import kotlinx.coroutines.flow.FlowCollector
 

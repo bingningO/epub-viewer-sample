@@ -13,8 +13,7 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import com.bing.epublib.ui.common.viewer.ViewerIndexData
-import com.bing.epublib.ui.skyEpub.SkyEpubViewerContract.BookPagingInfo
+import com.bing.epubViewerSample.ui.skyEpub.SkyEpubViewerContract.BookPagingInfo
 import com.skytree.epub.NavPoint
 import com.skytree.epub.SkyActivityState
 import timber.log.Timber
@@ -25,24 +24,15 @@ internal fun SkyEpubViewer(
     modifier: Modifier = Modifier,
     uiData: SkyEpubViewerContract.UiData,
     onLoadingStateChange: (Boolean) -> Unit,
-    onTap: () -> Unit,
-    onGetTotalPages: (Int) -> Unit,
-    onGetNavList: (List<ViewerIndexData<NavPoint>>) -> Unit,
     onPageChanged: (BookPagingInfo) -> Unit,
-    requestJumpGlobalIndexProgress: Int?,
-    requestJumpNav: NavPoint?,
-    onRequestJumpFinished: () -> Unit,
+    skyEpubViewerUiState: SkyEpubViewerUiState<NavPoint>,
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
     var viewerRef by remember {
         mutableStateOf(WeakReference<SkyEpubReflowableControl>(null))
     }
     val currentOnLoadingStateChange by rememberUpdatedState(onLoadingStateChange)
-    val currentOnRequestPageFinished by rememberUpdatedState(onRequestJumpFinished)
-    val currentOnTap by rememberUpdatedState(newValue = onTap)
     val currentOnPageChanged by rememberUpdatedState(newValue = onPageChanged)
-    val currentOnGetTotalPagesChanged by rememberUpdatedState(newValue = onGetTotalPages)
-    var maxIndex by remember { mutableStateOf(0) }
     var isInitLoading by remember { mutableStateOf(false) }
 
     DisposableEffect(lifecycleOwner) {
@@ -92,12 +82,12 @@ internal fun SkyEpubViewer(
                 // setListener, must call this to get totalPages by analysis global pagingInfo
                 setScanListener(
                     scanFinishedListener = { max ->
-                        currentOnGetTotalPagesChanged.invoke(max)
+                        skyEpubViewerUiState.seekBarState.totalPage = max
                         isInitLoading = false
                         currentOnLoadingStateChange.invoke(false)
                     },
                     getNavListener = {
-                        onGetNavList.invoke(it)
+                        skyEpubViewerUiState.bookIndexState.onIndexDataInitialized(it)
                     }
                 )
                 setLoadingListener {
@@ -106,31 +96,30 @@ internal fun SkyEpubViewer(
                     }
                 }
                 setOnPageMovedListener { info ->
-                    maxIndex = info.totalPage
                     currentOnPageChanged.invoke(info)
                 }
                 setOnScreenClicked {
-                    currentOnTap.invoke()
+                    skyEpubViewerUiState.setShowTopContent(true)
                 }
 
             }
         },
         update = { view ->
             Timber.v("epub log viewer update")
-            requestJumpGlobalIndexProgress?.let {
+            skyEpubViewerUiState.seekBarState.onProgressChangeRequest?.let {
                 if (view.isPaging.not()) {
                     val ppb = view.getPagePositionInBookByPageIndexInBook(it)
                     // So absolute position in epub is expressed as pagePositionInBook.
                     // This is float value from 0.0f to 1.0f for entire book.
                     view.gotoPageByPagePositionInBook(ppb)
 
-                    currentOnRequestPageFinished.invoke()
+                    skyEpubViewerUiState.seekBarState.onProgressChangeRequestConsumed()
                 }
             }
-            requestJumpNav?.let {
+            skyEpubViewerUiState.bookIndexState.onSelectedIndex?.let {
                 if (view.isPaging.not()) {
                     view.gotoPageByNavPoint(it)
-                    currentOnRequestPageFinished.invoke()
+                    skyEpubViewerUiState.bookIndexState.onIndexJumpConsumed()
                 }
             }
         }

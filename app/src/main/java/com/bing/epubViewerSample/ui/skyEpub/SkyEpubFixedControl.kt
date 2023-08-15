@@ -4,7 +4,7 @@ import android.content.Context
 import android.widget.Toast
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import com.bing.epublib.ui.common.viewer.ViewerIndexData
+import com.bing.epubViewerSample.ui.common.viewer.ViewerIndexData
 import com.skytree.epub.ClickListener
 import com.skytree.epub.FixedControl
 import com.skytree.epub.NavPoint

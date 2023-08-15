@@ -1,6 +1,6 @@
 package com.bing.epubViewerSample.repository
 
-import com.bing.epublib.model.EpubInfo
+import com.bing.epubViewerSample.model.EpubInfo
 
 interface EpubInfoRepository {
     suspend fun getEpubInfo(fileCode: Int): EpubInfo?

@@ -8,10 +8,10 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import com.bing.epublib.ui.navigation.ScreenRoutes
-import com.bing.epublib.ui.navigation.addHomeTopLevel
-import com.bing.epublib.ui.navigation.addSkyEpubViewerTopLevel
-import com.bing.epublib.ui.theme.EpubLibTheme
+import com.bing.epubViewerSample.ui.navigation.ScreenRoutes
+import com.bing.epubViewerSample.ui.navigation.addHomeTopLevel
+import com.bing.epubViewerSample.ui.navigation.addSkyEpubViewerTopLevel
+import com.bing.epubViewerSample.ui.theme.epubViewerSampleTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -21,7 +21,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val navController = rememberNavController()
 
-            EpubLibTheme {
+            epubViewerSampleTheme {
                 NavHost(
                     navController = navController,
                     startDestination = ScreenRoutes.Home.route

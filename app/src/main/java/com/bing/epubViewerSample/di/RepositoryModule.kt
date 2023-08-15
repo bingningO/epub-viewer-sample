@@ -1,7 +1,7 @@
 package com.bing.epubViewerSample.di
 
-import com.bing.epublib.repository.EpubInfoRepository
-import com.bing.epublib.repository.EpubInfoRepositoryImpl
+import com.bing.epubViewerSample.repository.EpubInfoRepository
+import com.bing.epubViewerSample.repository.EpubInfoRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

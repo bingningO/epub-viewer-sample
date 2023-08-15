@@ -1,7 +1,7 @@
 package com.bing.epubViewerSample.epubDomain
 
 import android.content.Context
-import com.bing.epublib.ui.common.IoDispatcher
+import com.bing.epubViewerSample.ui.common.IoDispatcher
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext

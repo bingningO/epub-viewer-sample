@@ -1,6 +1,6 @@
 package com.bing.epubViewerSample.ui.skyEpub
 
-import com.bing.epublib.ui.common.viewer.ViewerIndexData
+import com.bing.epubViewerSample.ui.common.viewer.ViewerIndexData
 import com.skytree.epub.NavPoint
 
 interface SkyEpubControlInterface {
