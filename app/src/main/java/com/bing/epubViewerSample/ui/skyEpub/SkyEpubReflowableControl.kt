@@ -83,16 +83,23 @@ class SkyEpubReflowableControl(context: Context, bookCode: Int, fontSize: Int) :
 
             override fun onPageMoved(pi: PageInformation?) {
                 // be notice [totalPage] is changed during pagination
-                if (isPaging.not()) {
+                Timber.v(
+                    "epub log onPageMoved: pageIndexInBook: ${pi?.pageIndexInBook}, pagePositionInBook: ${pi?.pagePositionInBook}, numberOfPagesInBook: ${pi?.numberOfPagesInBook}, numberOfPagesInChapter: ${pi?.numberOfPagesInChapter}, pageIndex: ${pi?.pageIndex}, chapterIndex: ${pi?.chapterIndex}, numberOfChaptersInBook: ${pi?.numberOfChaptersInBook}, cgpi: ${
+                        getPageIndexInBookByPagePositionInBook(
+                            pi?.pagePositionInBook ?: 0.0
+                        )
+                    }"
+                )
+                if (isPaging.not() && pi != null && pi.numberOfPagesInBook != 0) {
                     listener.invoke(
                         SkyEpubViewerContract.BookPagingInfo(
-                            totalPageInChapter = pi?.numberOfPagesInChapter ?: 0,
-                            currentIndexInChapter = pi?.pageIndex ?: 0,
-                            currentIndexInBook = pi?.pageIndexInBook ?: 0,
-                            currentPositionInBook = pi?.pagePositionInBook ?: 0.0,
-                            currentChapterIndex = pi?.chapterIndex ?: 0,
-                            totalNumberOfChapters = pi?.numberOfChaptersInBook ?: 0,
-                            totalPage = pi?.numberOfPagesInBook ?: 0
+                            totalPageInChapter = pi.numberOfPagesInChapter,
+                            currentIndexInChapter = pi.pageIndex,
+                            currentIndexInBook = pi.pageIndexInBook,
+                            currentPositionInBook = pi.pagePositionInBook,
+                            currentChapterIndex = pi.chapterIndex,
+                            totalNumberOfChapters = pi.numberOfChaptersInBook,
+                            totalPage = pi.numberOfPagesInBook
                         )
                     )
                 }
@@ -152,7 +159,7 @@ class SkyEpubReflowableControl(context: Context, bookCode: Int, fontSize: Int) :
 
 
     fun setScanListener(
-        scanFinishedListener: (totalPage: Int) -> Unit,
+        scanFinishedListener: (totalPage: Int, currentIndex: Int) -> Unit,
         getNavListener: (List<ViewerIndexData<NavPoint>>) -> Unit
     ) {
         // set the pagingListener which is called when GlobalPagination is true.
@@ -191,8 +198,8 @@ class SkyEpubReflowableControl(context: Context, bookCode: Int, fontSize: Int) :
             }
 
             override fun onScanFinished(p0: Int) {
-                Timber.v("epub log onScanFinished: $p0, $numberOfPagesInBook")
-                scanFinishedListener.invoke(numberOfPagesInBook)
+                Timber.v("epub log onScanFinished: $p0, $numberOfPagesInBook, $pageIndexInBook")
+                scanFinishedListener.invoke(numberOfPagesInBook, pageIndexInBook)
                 getNavListener.invoke(getNavData())
             }
 

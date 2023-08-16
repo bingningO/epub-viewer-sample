@@ -63,7 +63,7 @@ internal fun SkyEpubViewer(
             lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
-    
+
     LaunchedEffect(uiData.realFontSize) {
         viewerRef.get()?.setFontSizeIfNotLoading(uiData.realFontSize)
     }
@@ -80,12 +80,16 @@ internal fun SkyEpubViewer(
                 // init
                 setBookPath(uiData.bookPath)
                 setContentProvider(uiData.bookProvider)
+                // todo seems have bug to setStartPositionInBook,
                 setStartPositionInBook(uiData.initialPositionInBook)
 
                 // setListener, must call this to get totalPages by analysis global pagingInfo
                 setScanListener(
-                    scanFinishedListener = { max ->
-                        currentUiState.seekBarState.totalPage = max
+                    scanFinishedListener = { max, currentIndex ->
+                        currentUiState.seekBarState.onPageInfoChanged(
+                            currentIndex = currentIndex,
+                            totalPage = max
+                        )
                         isInitLoading = false
                         currentOnLoadingStateChange.invoke(false)
                     },

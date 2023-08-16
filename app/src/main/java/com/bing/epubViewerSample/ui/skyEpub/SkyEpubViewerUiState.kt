@@ -50,8 +50,13 @@ fun <T> rememberSkyEpubViewerUiState(
 
 @Stable
 class SeekBarState {
-    var currentIndex by mutableStateOf(0)
-    var totalPage by mutableStateOf(0)
+    private var _currentIndex by mutableStateOf(0)
+    private var _totalPage by mutableStateOf(0)
+
+    val totalPage: Int
+        get() = _totalPage
+    val currentIndex: Int
+        get() = _currentIndex
 
     private var _onProgressChangeRequest: Int? by mutableStateOf(null)
     val onProgressChangeRequest: Int?
@@ -66,8 +71,8 @@ class SeekBarState {
     }
 
     fun onPageInfoChanged(currentIndex: Int, totalPage: Int) {
-        this.currentIndex = currentIndex
-        this.totalPage = totalPage
+        this._currentIndex = currentIndex
+        this._totalPage = totalPage
     }
 }
 

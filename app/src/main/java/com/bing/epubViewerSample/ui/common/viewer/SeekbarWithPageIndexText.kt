@@ -6,7 +6,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,13 +26,11 @@ internal fun ViewerControllerSeekbarWithPageIndexText(
 ) {
     var displayProgress: Float by remember(currentIndex) {
         mutableStateOf(
-            currentIndex.toFloat()
+            currentIndex.toFloat() + 1
         )
     }
     val maxIndex by remember(totalPage) {
-        derivedStateOf {
-            (totalPage.toFloat() - 1)
-        }
+        mutableStateOf(totalPage.toFloat())
     }
 
     Row(
