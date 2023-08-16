@@ -8,29 +8,28 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.bing.epubViewerSample.ui.common.viewer.ViewerIndexData
 
+// todo does it need Saver to survival activity recreation?
 @Stable
 class SkyEpubViewerUiState<T>(
     val seekBarState: SeekBarState,
     val bookIndexState: BookIndexState<T>
 ) {
-    private var _isShowTopContent by mutableStateOf(false)
-    private var _isTOCVisible by mutableStateOf(false)
-    val isShowTopContent: Boolean
-        get() = _isShowTopContent
-    val isTOCVisible: Boolean
-        get() = _isTOCVisible
+    var isShowTopContent by mutableStateOf(false)
+        private set
+    var isTOCVisible by mutableStateOf(false)
+        private set
 
     fun onBookIndexClicked(index: T) {
         bookIndexState.onIndexClicked(index)
-        _isTOCVisible = false
+        isTOCVisible = false
     }
 
     fun setTocVisible(visible: Boolean) {
-        _isTOCVisible = visible
+        isTOCVisible = visible
     }
 
     fun setShowTopContent(visible: Boolean) {
-        _isShowTopContent = visible
+        isShowTopContent = visible
     }
 }
 
@@ -50,13 +49,10 @@ fun <T> rememberSkyEpubViewerUiState(
 
 @Stable
 class SeekBarState {
-    private var _currentIndex by mutableStateOf(0)
-    private var _totalPage by mutableStateOf(0)
-
-    val totalPage: Int
-        get() = _totalPage
-    val currentIndex: Int
-        get() = _currentIndex
+    var currentIndex by mutableStateOf(0)
+        private set
+    var totalPage by mutableStateOf(0)
+        private set
 
     private var _onProgressChangeRequest: Int? by mutableStateOf(null)
     val onProgressChangeRequest: Int?
@@ -71,8 +67,8 @@ class SeekBarState {
     }
 
     fun onPageInfoChanged(currentIndex: Int, totalPage: Int) {
-        this._currentIndex = currentIndex
-        this._totalPage = totalPage
+        this.currentIndex = currentIndex
+        this.totalPage = totalPage
     }
 }
 
@@ -81,23 +77,21 @@ fun rememberSeekBarState() = remember { SeekBarState() }
 
 @Stable
 class BookIndexState<T> {
-    private var _indexList by mutableStateOf(listOf<ViewerIndexData<T>>())
-    private var _onSelectedIndex by mutableStateOf<T?>(null)
-    val indexList: List<ViewerIndexData<T>>
-        get() = _indexList
-    val onSelectedIndex: T?
-        get() = _onSelectedIndex
+    var indexList by mutableStateOf(listOf<ViewerIndexData<T>>())
+        private set
+    var onSelectedIndex by mutableStateOf<T?>(null)
+        private set
 
     fun onIndexClicked(index: T) {
-        _onSelectedIndex = index
+        onSelectedIndex = index
     }
 
     fun onIndexDataInitialized(index: List<ViewerIndexData<T>>) {
-        _indexList = index
+        indexList = index
     }
 
     fun onIndexJumpConsumed() {
-        _onSelectedIndex = null
+        onSelectedIndex = null
     }
 }
 

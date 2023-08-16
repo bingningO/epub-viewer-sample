@@ -113,6 +113,13 @@ internal fun SkyEpubViewer(
         },
         update = { view ->
             Timber.v("epub log viewer update")
+            /**
+             * todo
+             * how about MAD's implementation of LaunchedEffect?
+             * LaunchedEffect(onProgressChangeRequest) {
+             *     ...
+             * }
+             */
             skyEpubViewerUiState.seekBarState.onProgressChangeRequest?.let {
                 if (view.isPaging.not()) {
                     val ppb = view.getPagePositionInBookByPageIndexInBook(it)
