@@ -4,7 +4,6 @@ import android.content.Context
 import android.widget.Toast
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import com.bing.epubViewerSample.ui.common.viewer.ViewerIndexData
 import com.bing.epubViewerSample.ui.viewer.BookViewerContract
 import com.skytree.epub.ClickListener
 import com.skytree.epub.FixedControl
@@ -112,24 +111,17 @@ class BookViewerFixed(context: Context, bookCodeValue: Int) : FixedControl(conte
 
     override fun setScanListener(
         listener: (totalPage: Int) -> Unit,
-        getNavListener: (List<ViewerIndexData<NavPoint>>) -> Unit
+        getNavListener: (List<NavPoint>) -> Unit
     ) {
 //        listener.invoke(pageCount)
 //        getNavListener.invoke(getNavData())
     }
 
-    private fun getNavData(): List<ViewerIndexData<NavPoint>> {
+    private fun getNavData(): List<NavPoint> {
         val navDatas = navPoints
-        val navList = mutableListOf<ViewerIndexData<NavPoint>>()
+        val navList = mutableListOf<NavPoint>()
         (0 until navDatas.size).forEach {
-            val nav = navDatas.getNavPoint(it)
-            navList.add(
-                ViewerIndexData(
-                    indexTitle = nav.text,
-                    nestLevel = nav.depth,
-                    pageData = nav
-                )
-            )
+            navList.add(navDatas.getNavPoint(it))
         }
         return navList
     }

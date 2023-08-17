@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Epub Viewer Sample</string>
 
-    <string name="table_of_content">TOC</string>
+    <string name="table_of_content">Table of Contents</string>
 
     <string name="font_size">Font Size</string>
     <string name="font_size_bigger">Bigger</string>

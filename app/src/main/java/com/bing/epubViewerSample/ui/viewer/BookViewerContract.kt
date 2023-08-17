@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.DefaultLifecycleObserver
 import com.bing.epubViewerSample.ui.common.UIEvent
+import com.skytree.epub.NavPoint
 import com.skytree.epub.SkyProvider
 import kotlinx.coroutines.flow.FlowCollector
 
@@ -24,11 +25,12 @@ class BookViewerContract {
     }
 
     interface UiInput {
-        val onEventConsumed: FlowCollector<SkyEpubViewerEvent>
-        val onLoadingStateChanged: FlowCollector<Boolean>
+        val onEventConsume: FlowCollector<SkyEpubViewerEvent>
+        val onLoadingStateChange: FlowCollector<Boolean>
         val onChangePagePosition: FlowCollector<Double>
         val onClickFontSizeBigger: FlowCollector<Unit>
         val onClickFontSizeSmaller: FlowCollector<Unit>
+        val onIndexDataLoad: FlowCollector<List<NavPoint>>
     }
 
     @Stable
@@ -42,7 +44,18 @@ class BookViewerContract {
         val isFixedLayout: Boolean
         val realFontSize: Int
         val fontSizeIndex: Int
+        val indexList: List<ViewerIndexData<NavPoint>>
     }
+
+    @Immutable
+    data class ViewerIndexData<T>(
+        val indexTitle: String,
+        val pageData: T,
+        /**
+         *  level of this index, 0 is the first-level
+         */
+        val nestLevel: Int,
+    )
 
     @Stable
     data class BookPagingInfo(
@@ -65,6 +78,7 @@ class BookViewerContract {
         override var isFixedLayout: Boolean by mutableStateOf(false)
         override var realFontSize: Int by mutableStateOf(0)
         override var fontSizeIndex: Int by mutableStateOf(0)
+        override var indexList: List<ViewerIndexData<NavPoint>> by mutableStateOf(emptyList())
     }
 
     @Immutable

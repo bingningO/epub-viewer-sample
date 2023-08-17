@@ -1,6 +1,5 @@
 package com.bing.epubViewerSample.ui.viewer.androidView
 
-import com.bing.epubViewerSample.ui.common.viewer.ViewerIndexData
 import com.bing.epubViewerSample.ui.viewer.BookViewerContract
 import com.skytree.epub.NavPoint
 
@@ -11,6 +10,6 @@ interface BookViewerInterface {
 
     fun setScanListener(
         listener: (totalPage: Int) -> Unit,
-        getNavListener: (List<ViewerIndexData<NavPoint>>) -> Unit
+        getNavListener: (List<NavPoint>) -> Unit
     )
 }

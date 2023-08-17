@@ -4,7 +4,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.bing.epubViewerSample.ui.home.HomeScreen
-import com.bing.epubViewerSample.ui.viewer.SkyEpubViewerScreen
+import com.bing.epubViewerSample.ui.viewer.BookViewerScreen
 
 fun NavGraphBuilder.addHomeTopLevel(
     navController: NavController
@@ -22,7 +22,7 @@ fun NavGraphBuilder.addSkyEpubViewerTopLevel(
     navController: NavController,
 ) {
     composable(ScreenRoutes.SkyEpubViewer.route) {
-        SkyEpubViewerScreen(onCloseClick = {
+        BookViewerScreen(onCloseClick = {
             navController.popBackStack()
         })
     }

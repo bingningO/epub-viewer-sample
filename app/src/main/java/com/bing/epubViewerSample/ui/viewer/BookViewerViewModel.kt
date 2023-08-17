@@ -13,6 +13,7 @@ import com.bing.epubViewerSample.ui.viewer.BookViewerContract.SkyEpubViewerEvent
 import com.bing.epubViewerSample.ui.viewer.BookViewerContract.UiData
 import com.bing.epubViewerSample.ui.viewer.BookViewerContract.UiInput
 import com.bing.epubViewerSample.ui.viewer.BookViewerContract.UiState
+import com.skytree.epub.NavPoint
 import com.skytree.epub.SkyProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -40,13 +41,15 @@ class BookViewerViewModel @Inject constructor(
     private val _onChangePagePosition = MutableSharedFlow<Double>()
     private val _onClickFontSizeBigger = MutableSharedFlow<Unit>()
     private val _onClickFontSizeSmaller = MutableSharedFlow<Unit>()
+    private val _onIndexDataLoad = MutableSharedFlow<List<NavPoint>>()
 
     override val uiInput: UiInput = object : UiInput {
-        override val onEventConsumed = eventHandler.onEventConsumed
-        override val onLoadingStateChanged = _onLoadingStateChanged
+        override val onEventConsume = eventHandler.onEventConsumed
+        override val onLoadingStateChange = _onLoadingStateChanged
         override val onChangePagePosition = _onChangePagePosition
         override val onClickFontSizeBigger = _onClickFontSizeBigger
         override val onClickFontSizeSmaller = _onClickFontSizeSmaller
+        override val onIndexDataLoad = _onIndexDataLoad
     }
 
     // change the book name here to open different book file(also they need to be copied to assets dir)
@@ -123,6 +126,12 @@ class BookViewerViewModel @Inject constructor(
         }.launchIn(viewModelScope)
         _onClickFontSizeBigger.onEach {
             updateFontSizeAndSaveInDB(_uiData.fontSizeIndex + 1)
+        }.launchIn(viewModelScope)
+
+        _onIndexDataLoad.onEach {
+            _uiData.indexList = it.map { navPoint ->
+                BookViewerContract.ViewerIndexData(navPoint.text, navPoint, navPoint.depth)
+            }
         }.launchIn(viewModelScope)
     }
 

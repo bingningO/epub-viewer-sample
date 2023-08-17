@@ -3,7 +3,6 @@ package com.bing.epubViewerSample.ui.viewer.androidView
 import android.content.Context
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import com.bing.epubViewerSample.ui.common.viewer.ViewerIndexData
 import com.bing.epubViewerSample.ui.viewer.BookViewerContract
 import com.skytree.epub.ClickListener
 import com.skytree.epub.ItemRef
@@ -62,19 +61,12 @@ class BookViewerReflowable(context: Context, bookCode: Int, fontSize: Int) :
         changeFont(FONT_SIZE_NAME, realFontSize)
     }
 
-    private fun getNavData(): List<ViewerIndexData<NavPoint>> {
+    private fun getNavData(): List<NavPoint> {
         val navDatas = navPoints
-        val navList = mutableListOf<ViewerIndexData<NavPoint>>()
+        val navList = mutableListOf<NavPoint>()
         Timber.v("epub log get navPoints: ${navDatas.size}")
         (0 until navDatas.size).forEach {
-            val nav = navDatas.getNavPoint(it)
-            navList.add(
-                ViewerIndexData(
-                    indexTitle = nav.text,
-                    nestLevel = nav.depth,
-                    pageData = nav
-                )
-            )
+            navList.add(navDatas.getNavPoint(it))
         }
         return navList
     }
@@ -154,7 +146,7 @@ class BookViewerReflowable(context: Context, bookCode: Int, fontSize: Int) :
 
     fun setScanListener(
         scanFinishedListener: (totalPage: Int, currentIndex: Int) -> Unit,
-        getNavListener: (List<ViewerIndexData<NavPoint>>) -> Unit
+        getNavListener: (List<NavPoint>) -> Unit
     ) {
         // set the pagingListener which is called when GlobalPagination is true.
         // this enables the calculation for the total number of pages in book, not in chapter.

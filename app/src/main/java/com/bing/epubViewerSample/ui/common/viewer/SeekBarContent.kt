@@ -26,8 +26,6 @@ import com.bing.epubViewerSample.R
 import com.bing.epubViewerSample.model.FontSize
 import com.bing.epubViewerSample.ui.theme.Paddings
 import com.bing.epubViewerSample.ui.theme.epubViewerSampleTheme
-import com.bing.epubViewerSample.ui.viewer.SeekBarState
-import com.bing.epubViewerSample.ui.viewer.rememberSeekBarState
 
 /**
  * @param onChangeSeekbarProgressFinish 0f ~ 1f
@@ -39,7 +37,9 @@ fun SeekBarContent(
     onCloseClick: () -> Unit,
     onIndexClick: () -> Unit,
     onFontSizeSelected: (FontSize) -> Unit,
-    seekBarState: SeekBarState,
+    currentIndex: Int,
+    totalPage: Int,
+    onChangeSeekbarProgressFinish: (globalIndex: Int) -> Unit,
 ) {
 
     Box(
@@ -62,11 +62,9 @@ fun SeekBarContent(
         ) {
             ViewerControllerSeekbarWithPageIndexText(
                 modifier = Modifier.fillMaxWidth(),
-                currentIndex = seekBarState.currentIndex,
-                totalPage = seekBarState.totalPage,
-                onChangeSeekbarProgressFinish = {
-                    seekBarState.onProgressChangeRequest(it)
-                }
+                currentIndex = currentIndex,
+                totalPage = totalPage,
+                onChangeSeekbarProgressFinish = onChangeSeekbarProgressFinish,
             )
 
             SettingButtonWithPopup(
@@ -172,13 +170,13 @@ private fun ViewerControllerTopBar(
 private fun SeekBarContentPreview() {
     epubViewerSampleTheme {
         SeekBarContent(
-            seekBarState = rememberSeekBarState().apply {
-                onPageInfoChanged(10, 120)
-            },
             onClick = {},
             onCloseClick = {},
             onIndexClick = {},
             onFontSizeSelected = {},
+            currentIndex = 25,
+            totalPage = 100,
+            onChangeSeekbarProgressFinish = {},
         )
     }
 }

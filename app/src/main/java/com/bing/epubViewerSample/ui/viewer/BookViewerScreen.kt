@@ -22,12 +22,11 @@ import com.bing.epubViewerSample.ui.common.composable.ErrorScreen
 import com.bing.epubViewerSample.ui.common.composable.LoadingScreen
 import com.bing.epubViewerSample.ui.common.viewer.ViewerTopContent
 import com.bing.epubViewerSample.ui.viewer.BookViewerContract.*
-import com.skytree.epub.NavPoint
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @Composable
-fun SkyEpubViewerScreen(
+fun BookViewerScreen(
     viewModel: ViewModel = hiltViewModel<BookViewerViewModel>(),
     onCloseClick: () -> Unit
 ) {
@@ -43,39 +42,28 @@ fun SkyEpubViewerScreen(
                     Toast.makeText(context, event.message, Toast.LENGTH_LONG).show()
                 }
             }
-            uiInput.onEventConsumed.emit(event)
+            uiInput.onEventConsume.emit(event)
         }
     }
-    SkyEpubViewerContent(
-        uiData = uiState.uiData,
-        uiInput = uiInput,
-        onCloseClick = onCloseClick
-    )
-}
+    uiState.uiData.let { uiData ->
+        when {
+            uiData.error != null -> {
+                ErrorScreen(error = uiData.error!!)
+            }
 
-@Composable
-private fun SkyEpubViewerContent(
-    uiData: UiData,
-    uiInput: UiInput,
-    onCloseClick: () -> Unit
-) {
-    when {
-        uiData.error != null -> {
-            ErrorScreen(error = uiData.error!!)
-        }
+            else -> {
+                Surface(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    if (uiData.bookProvider != null) {
+                        BookViewerSuccessContent(
+                            uiData = uiData, uiInput = uiInput, onCloseClick = onCloseClick
+                        )
+                    }
 
-        else -> {
-            Surface(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                if (uiData.bookProvider != null) {
-                    SkyEpubViewerSuccessContent(
-                        uiData = uiData, uiInput = uiInput, onCloseClick = onCloseClick
-                    )
-                }
-
-                if (uiData.isLoading) {
-                    LoadingScreen()
+                    if (uiData.isLoading) {
+                        LoadingScreen()
+                    }
                 }
             }
         }
@@ -84,46 +72,46 @@ private fun SkyEpubViewerContent(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun SkyEpubViewerSuccessContent(
+private fun BookViewerSuccessContent(
     uiData: UiData,
     uiInput: UiInput,
     onCloseClick: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    val skyEpubViewerUiState = rememberSkyEpubViewerUiState<NavPoint>()
+    val bookViewerState = rememberBookViewerState()
 
     CompositionLocalProvider(
         LocalOverscrollConfiguration provides null,
     ) {
         SkyEpubViewer(
             uiData = uiData,
+            bookViewerState = bookViewerState,
             onLoadingStateChange = {
-                scope.launch { uiInput.onLoadingStateChanged.emit(it) }
+                scope.launch { uiInput.onLoadingStateChange.emit(it) }
             },
-            onPageChanged = {
-                skyEpubViewerUiState.seekBarState.onPageInfoChanged(
-                    it.currentIndexInBook,
-                    it.totalPage
-                )
+            onPageChange = {
                 scope.launch {
                     uiInput.onChangePagePosition.emit(it.currentPositionInBook)
                 }
             },
-            bookViewerUiState = skyEpubViewerUiState,
+            onIndexDataLoad = {
+                scope.launch { uiInput.onIndexDataLoad.emit(it) }
+            }
         )
     }
 
     AnimatedVisibility(
-        visible = skyEpubViewerUiState.isShowTopContent,
+        visible = bookViewerState.isShowTopContent,
         enter = fadeIn(),
         exit = fadeOut()
     ) {
         ViewerTopContent(
             onClick = {
-                skyEpubViewerUiState.updateShowTopContent(false)
+                bookViewerState.updateShowTopContent(false)
             },
             onCloseClick = onCloseClick,
-            bookViewerUiState = skyEpubViewerUiState,
+            bookViewerState = bookViewerState,
+            indexList = uiData.indexList,
             onFontSizeSelected = {
                 when (it) {
                     BIGGER -> {

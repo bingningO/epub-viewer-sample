@@ -8,37 +8,47 @@ import androidx.compose.ui.res.stringResource
 import com.bing.epubViewerSample.R
 import com.bing.epubViewerSample.model.FontSize
 import com.bing.epubViewerSample.ui.common.composable.SlidePanelWithTranslucentBackground
-import com.bing.epubViewerSample.ui.viewer.BookViewerUiState
+import com.bing.epubViewerSample.ui.viewer.BookViewerContract.ViewerIndexData
+import com.bing.epubViewerSample.ui.viewer.BookViewerState
 
+/**
+ * Top content of the viewer screen for user to interact,
+ * including seek bar, index, and other setting buttons.
+ */
 @Composable
 fun <T> ViewerTopContent(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
     onCloseClick: () -> Unit,
     onFontSizeSelected: (FontSize) -> Unit,
-    bookViewerUiState: BookViewerUiState<T>,
+    bookViewerState: BookViewerState<T>,
+    indexList: List<ViewerIndexData<T>>,
 ) {
-    Box {
+    Box(modifier = modifier.fillMaxSize()) {
         SeekBarContent(
-            seekBarState = bookViewerUiState.seekBarState,
             onClick = onClick,
             onCloseClick = onCloseClick,
             onIndexClick = {
-                bookViewerUiState.updateTocVisible(true)
+                bookViewerState.updateTocVisible(true)
             },
-            onFontSizeSelected = onFontSizeSelected
+            onFontSizeSelected = onFontSizeSelected,
+            currentIndex = bookViewerState.currentIndex,
+            totalPage = bookViewerState.totalPage,
+            onChangeSeekbarProgressFinish = {
+                bookViewerState.seekBarState.onProgressChangeRequest(it)
+            },
         )
 
         SlidePanelWithTranslucentBackground(
             modifier = Modifier.fillMaxSize(),
-            isVisible = bookViewerUiState.isTOCVisible,
+            isVisible = bookViewerState.isTOCVisible,
             title = stringResource(R.string.table_of_content),
-            onHide = { bookViewerUiState.updateTocVisible(false) },
+            onHide = { bookViewerState.updateTocVisible(false) },
             content = {
                 EpubViewerBookIndexContent(
-                    bookIndexState = bookViewerUiState.bookIndexState,
+                    indexList = indexList,
                     onIndexClicked = {
-                        bookViewerUiState.onBookIndexClicked(it)
+                        bookViewerState.onBookIndexClicked(it)
                     }
                 )
             },

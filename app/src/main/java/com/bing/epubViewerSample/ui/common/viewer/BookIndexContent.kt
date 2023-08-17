@@ -12,20 +12,18 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.bing.epubViewerSample.ui.theme.Paddings
 import com.bing.epubViewerSample.ui.theme.epubViewerSampleTheme
-import com.bing.epubViewerSample.ui.viewer.BookIndexState
-import com.bing.epubViewerSample.ui.viewer.rememberBookIndexState
+import com.bing.epubViewerSample.ui.viewer.BookViewerContract.ViewerIndexData
 
 @Composable
 internal fun <T> EpubViewerBookIndexContent(
     modifier: Modifier = Modifier,
-    bookIndexState: BookIndexState<T>,
+    indexList: List<ViewerIndexData<T>>,
     onIndexClicked: (T) -> Unit,
 ) {
     LazyColumn(
@@ -37,7 +35,7 @@ internal fun <T> EpubViewerBookIndexContent(
         )
     ) {
         itemsIndexed(
-            items = bookIndexState.indexList,
+            items = indexList,
             key = { index, item -> "${index}_${item.pageData.hashCode()}" }
         ) { _, indexData ->
             val displayTitle = buildString {
@@ -60,16 +58,6 @@ internal fun <T> EpubViewerBookIndexContent(
     }
 }
 
-@Immutable
-data class ViewerIndexData<T>(
-    val indexTitle: String,
-    val pageData: T,
-    /**
-     *  level of this index, 0 is the first-level
-     */
-    val nestLevel: Int,
-)
-
 @Preview
 @Composable
 private fun EpubViewerBookIndexContentPreview() {
@@ -84,12 +72,9 @@ private fun EpubViewerBookIndexContentPreview() {
             )
         }
     }
-    val bookIndexState = rememberBookIndexState<String>().apply {
-        onIndexDataInitialized(dummyList)
-    }
     epubViewerSampleTheme() {
         EpubViewerBookIndexContent<String>(
-            bookIndexState = bookIndexState,
+            indexList = dummyList,
             onIndexClicked = { }
         )
     }

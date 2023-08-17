@@ -25,9 +25,9 @@ internal fun SkyEpubViewer(
     modifier: Modifier = Modifier,
     uiData: BookViewerContract.UiData,
     onLoadingStateChange: (Boolean) -> Unit,
-    // todo unit name to onXXXXchange
-    onPageChanged: (BookPagingInfo) -> Unit,
-    bookViewerUiState: BookViewerUiState<NavPoint>,
+    onPageChange: (BookPagingInfo) -> Unit,
+    onIndexDataLoad: (List<NavPoint>) -> Unit,
+    bookViewerState: BookViewerState<NavPoint>,
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
     var viewerRef by remember {
@@ -37,8 +37,9 @@ internal fun SkyEpubViewer(
 
     // always read the updated value if called inside AndroidView#factory
     val currentOnLoadingStateChange by rememberUpdatedState(onLoadingStateChange)
-    val currentOnPageChanged by rememberUpdatedState(newValue = onPageChanged)
-    val currentUiState by rememberUpdatedState(newValue = bookViewerUiState)
+    val currentOnPageChanged by rememberUpdatedState(newValue = onPageChange)
+    val currentUiState by rememberUpdatedState(newValue = bookViewerState)
+    val currentOnIndexDataLoad by rememberUpdatedState(newValue = onIndexDataLoad)
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
@@ -87,7 +88,7 @@ internal fun SkyEpubViewer(
                 // setListener, must call this to get totalPages by analysis global pagingInfo
                 setScanListener(
                     scanFinishedListener = { max, currentIndex ->
-                        currentUiState.seekBarState.onPageInfoChanged(
+                        currentUiState.onPageInfoChanged(
                             currentIndex = currentIndex,
                             totalPage = max
                         )
@@ -95,7 +96,7 @@ internal fun SkyEpubViewer(
                         currentOnLoadingStateChange.invoke(false)
                     },
                     getNavListener = {
-                        currentUiState.bookIndexState.onIndexDataInitialized(it)
+                        currentOnIndexDataLoad.invoke(it)
                     }
                 )
                 setLoadingListener {
@@ -104,6 +105,10 @@ internal fun SkyEpubViewer(
                     }
                 }
                 setOnPageMovedListener { info ->
+                    bookViewerState.onPageInfoChanged(
+                        info.currentIndexInBook,
+                        info.totalPage
+                    )
                     currentOnPageChanged.invoke(info)
                 }
                 setOnScreenClicked {
@@ -114,20 +119,20 @@ internal fun SkyEpubViewer(
         },
         update = { view ->
             Timber.v("epub log viewer update")
-            bookViewerUiState.seekBarState.onProgressChangeRequest?.let {
+            bookViewerState.seekBarState.onProgressChangeRequest?.let {
                 if (view.isPaging.not()) {
                     val ppb = view.getPagePositionInBookByPageIndexInBook(it)
                     // So absolute position in epub is expressed as pagePositionInBook.
                     // This is float value from 0.0f to 1.0f for entire book.
                     view.gotoPageByPagePositionInBook(ppb)
 
-                    bookViewerUiState.seekBarState.onProgressChangeRequestConsumed()
+                    bookViewerState.seekBarState.onProgressChangeRequestConsumed()
                 }
             }
-            bookViewerUiState.bookIndexState.onSelectedIndex?.let {
+            bookViewerState.bookIndexState.onSelectedIndex?.let {
                 if (view.isPaging.not()) {
                     view.gotoPageByNavPoint(it)
-                    bookViewerUiState.bookIndexState.onIndexJumpConsumed()
+                    bookViewerState.bookIndexState.onIndexJumpConsumed()
                 }
             }
         },
