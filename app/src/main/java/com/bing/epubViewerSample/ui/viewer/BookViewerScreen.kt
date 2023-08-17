@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalFoundationApi::class, ExperimentalFoundationApi::class)
 
-package com.bing.epubViewerSample.ui.skyEpub
+package com.bing.epubViewerSample.ui.viewer
 
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
@@ -21,14 +21,14 @@ import com.bing.epubViewerSample.model.FontSize.*
 import com.bing.epubViewerSample.ui.common.composable.ErrorScreen
 import com.bing.epubViewerSample.ui.common.composable.LoadingScreen
 import com.bing.epubViewerSample.ui.common.viewer.ViewerTopContent
-import com.bing.epubViewerSample.ui.skyEpub.SkyEpubViewerContract.*
+import com.bing.epubViewerSample.ui.viewer.BookViewerContract.*
 import com.skytree.epub.NavPoint
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @Composable
 fun SkyEpubViewerScreen(
-    viewModel: ViewModel = hiltViewModel<SkyEpubViewerViewModel>(),
+    viewModel: ViewModel = hiltViewModel<BookViewerViewModel>(),
     onCloseClick: () -> Unit
 ) {
     val context = LocalContext.current
@@ -109,7 +109,7 @@ private fun SkyEpubViewerSuccessContent(
                     uiInput.onChangePagePosition.emit(it.currentPositionInBook)
                 }
             },
-            skyEpubViewerUiState = skyEpubViewerUiState,
+            bookViewerUiState = skyEpubViewerUiState,
         )
     }
 
@@ -123,7 +123,7 @@ private fun SkyEpubViewerSuccessContent(
                 skyEpubViewerUiState.updateShowTopContent(false)
             },
             onCloseClick = onCloseClick,
-            skyEpubViewerUiState = skyEpubViewerUiState,
+            bookViewerUiState = skyEpubViewerUiState,
             onFontSizeSelected = {
                 when (it) {
                     BIGGER -> {

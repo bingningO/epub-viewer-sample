@@ -1,4 +1,4 @@
-package com.bing.epubViewerSample.ui.skyEpub
+package com.bing.epubViewerSample.ui.viewer
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -13,7 +13,8 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import com.bing.epubViewerSample.ui.skyEpub.SkyEpubViewerContract.BookPagingInfo
+import com.bing.epubViewerSample.ui.viewer.BookViewerContract.BookPagingInfo
+import com.bing.epubViewerSample.ui.viewer.androidView.BookViewerReflowable
 import com.skytree.epub.NavPoint
 import com.skytree.epub.SkyActivityState
 import timber.log.Timber
@@ -22,21 +23,22 @@ import java.lang.ref.WeakReference
 @Composable
 internal fun SkyEpubViewer(
     modifier: Modifier = Modifier,
-    uiData: SkyEpubViewerContract.UiData,
+    uiData: BookViewerContract.UiData,
     onLoadingStateChange: (Boolean) -> Unit,
+    // todo unit name to onXXXXchange
     onPageChanged: (BookPagingInfo) -> Unit,
-    skyEpubViewerUiState: SkyEpubViewerUiState<NavPoint>,
+    bookViewerUiState: BookViewerUiState<NavPoint>,
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
     var viewerRef by remember {
-        mutableStateOf(WeakReference<SkyEpubReflowableControl>(null))
+        mutableStateOf(WeakReference<BookViewerReflowable>(null))
     }
     var isInitLoading by remember { mutableStateOf(false) }
 
     // always read the updated value if called inside AndroidView#factory
     val currentOnLoadingStateChange by rememberUpdatedState(onLoadingStateChange)
     val currentOnPageChanged by rememberUpdatedState(newValue = onPageChanged)
-    val currentUiState by rememberUpdatedState(newValue = skyEpubViewerUiState)
+    val currentUiState by rememberUpdatedState(newValue = bookViewerUiState)
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
@@ -74,7 +76,7 @@ internal fun SkyEpubViewer(
             Timber.v("epub log viewer factory, ${uiData.initialPositionInBook}")
             isInitLoading = true
             currentOnLoadingStateChange.invoke(true)
-            SkyEpubReflowableControl(factoryContext, uiData.bookCode, uiData.realFontSize).apply {
+            BookViewerReflowable(factoryContext, uiData.bookCode, uiData.realFontSize).apply {
                 viewerRef = WeakReference(this)
 
                 // init
@@ -112,27 +114,20 @@ internal fun SkyEpubViewer(
         },
         update = { view ->
             Timber.v("epub log viewer update")
-            /**
-             * todo
-             * how about MAD's implementation of LaunchedEffect?
-             * LaunchedEffect(onProgressChangeRequest) {
-             *     ...
-             * }
-             */
-            skyEpubViewerUiState.seekBarState.onProgressChangeRequest?.let {
+            bookViewerUiState.seekBarState.onProgressChangeRequest?.let {
                 if (view.isPaging.not()) {
                     val ppb = view.getPagePositionInBookByPageIndexInBook(it)
                     // So absolute position in epub is expressed as pagePositionInBook.
                     // This is float value from 0.0f to 1.0f for entire book.
                     view.gotoPageByPagePositionInBook(ppb)
 
-                    skyEpubViewerUiState.seekBarState.onProgressChangeRequestConsumed()
+                    bookViewerUiState.seekBarState.onProgressChangeRequestConsumed()
                 }
             }
-            skyEpubViewerUiState.bookIndexState.onSelectedIndex?.let {
+            bookViewerUiState.bookIndexState.onSelectedIndex?.let {
                 if (view.isPaging.not()) {
                     view.gotoPageByNavPoint(it)
-                    skyEpubViewerUiState.bookIndexState.onIndexJumpConsumed()
+                    bookViewerUiState.bookIndexState.onIndexJumpConsumed()
                 }
             }
         },

@@ -1,9 +1,10 @@
-package com.bing.epubViewerSample.ui.skyEpub
+package com.bing.epubViewerSample.ui.viewer.androidView
 
 import android.content.Context
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.bing.epubViewerSample.ui.common.viewer.ViewerIndexData
+import com.bing.epubViewerSample.ui.viewer.BookViewerContract
 import com.skytree.epub.ClickListener
 import com.skytree.epub.ItemRef
 import com.skytree.epub.NavPoint
@@ -19,7 +20,7 @@ import timber.log.Timber
 /**
  * custom viewer extending SkyEpub SDK#ReflowableControl
  */
-class SkyEpubReflowableControl(context: Context, bookCode: Int, fontSize: Int) :
+class BookViewerReflowable(context: Context, bookCode: Int, fontSize: Int) :
     ReflowableControl(context) {
 
     private val savedPagingInformation = arrayListOf<PagingInformation>()
@@ -78,14 +79,14 @@ class SkyEpubReflowableControl(context: Context, bookCode: Int, fontSize: Int) :
         return navList
     }
 
-    fun setOnPageMovedListener(listener: (SkyEpubViewerContract.BookPagingInfo) -> Unit) {
+    fun setOnPageMovedListener(listener: (BookViewerContract.BookPagingInfo) -> Unit) {
         setPageMovedListener(object : PageMovedListener {
 
             override fun onPageMoved(pi: PageInformation?) {
                 // be notice [totalPage] is changed during pagination
                 if (isPaging.not() && pi != null && pi.numberOfPagesInBook != 0) {
                     listener.invoke(
-                        SkyEpubViewerContract.BookPagingInfo(
+                        BookViewerContract.BookPagingInfo(
                             totalPageInChapter = pi.numberOfPagesInChapter,
                             currentIndexInChapter = pi.pageIndex,
                             currentIndexInBook = pi.pageIndexInBook,

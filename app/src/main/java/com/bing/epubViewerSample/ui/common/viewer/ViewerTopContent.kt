@@ -8,7 +8,7 @@ import androidx.compose.ui.res.stringResource
 import com.bing.epubViewerSample.R
 import com.bing.epubViewerSample.model.FontSize
 import com.bing.epubViewerSample.ui.common.composable.SlidePanelWithTranslucentBackground
-import com.bing.epubViewerSample.ui.skyEpub.SkyEpubViewerUiState
+import com.bing.epubViewerSample.ui.viewer.BookViewerUiState
 
 @Composable
 fun <T> ViewerTopContent(
@@ -16,29 +16,29 @@ fun <T> ViewerTopContent(
     onClick: () -> Unit,
     onCloseClick: () -> Unit,
     onFontSizeSelected: (FontSize) -> Unit,
-    skyEpubViewerUiState: SkyEpubViewerUiState<T>,
+    bookViewerUiState: BookViewerUiState<T>,
 ) {
     Box {
         SeekBarContent(
-            seekBarState = skyEpubViewerUiState.seekBarState,
+            seekBarState = bookViewerUiState.seekBarState,
             onClick = onClick,
             onCloseClick = onCloseClick,
             onIndexClick = {
-                skyEpubViewerUiState.updateTocVisible(true)
+                bookViewerUiState.updateTocVisible(true)
             },
             onFontSizeSelected = onFontSizeSelected
         )
 
         SlidePanelWithTranslucentBackground(
             modifier = Modifier.fillMaxSize(),
-            isVisible = skyEpubViewerUiState.isTOCVisible,
+            isVisible = bookViewerUiState.isTOCVisible,
             title = stringResource(R.string.table_of_content),
-            onHide = { skyEpubViewerUiState.updateTocVisible(false) },
+            onHide = { bookViewerUiState.updateTocVisible(false) },
             content = {
                 EpubViewerBookIndexContent(
-                    bookIndexState = skyEpubViewerUiState.bookIndexState,
+                    bookIndexState = bookViewerUiState.bookIndexState,
                     onIndexClicked = {
-                        skyEpubViewerUiState.onBookIndexClicked(it)
+                        bookViewerUiState.onBookIndexClicked(it)
                     }
                 )
             },

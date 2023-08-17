@@ -1,4 +1,4 @@
-package com.bing.epubViewerSample.ui.skyEpub
+package com.bing.epubViewerSample.ui.viewer
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
@@ -8,9 +8,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.bing.epubViewerSample.ui.common.viewer.ViewerIndexData
 
-// todo does it need Saver to survival activity recreation?
 @Stable
-class SkyEpubViewerUiState<T>(
+class BookViewerUiState<T>(
     val seekBarState: SeekBarState,
     val bookIndexState: BookIndexState<T>
 ) {
@@ -34,6 +33,9 @@ class SkyEpubViewerUiState<T>(
 }
 
 @Composable
+// todo no need for common T
+// delete Ui
+// todo add [Saver] for all state
 fun <T> rememberSkyEpubViewerUiState(
     seeksBarState: SeekBarState = rememberSeekBarState(),
     bookIndexState: BookIndexState<T> = rememberBookIndexState()
@@ -41,7 +43,7 @@ fun <T> rememberSkyEpubViewerUiState(
     seeksBarState,
     bookIndexState,
 ) {
-    SkyEpubViewerUiState<T>(
+    BookViewerUiState<T>(
         seekBarState = seeksBarState,
         bookIndexState = bookIndexState
     )
@@ -49,6 +51,8 @@ fun <T> rememberSkyEpubViewerUiState(
 
 @Stable
 class SeekBarState {
+    // todo move currentIndex&totalPage to skyEpubViewerState
+    // -> how to sync currentIndex & Epub SDK#currentPage
     var currentIndex by mutableStateOf(0)
         private set
     var totalPage by mutableStateOf(0)
@@ -77,11 +81,21 @@ fun rememberSeekBarState() = remember { SeekBarState() }
 
 @Stable
 class BookIndexState<T> {
+    // ViewerIndexData<NavPoint> -> not good to rememberSavable with NavPoint
+    // todo put this into viewModel, survival from configuration change
+    // ネタ：if get data from view, where to put the state ( UI composable(savable-> bundle) or ViewModel )
     var indexList by mutableStateOf(listOf<ViewerIndexData<T>>())
         private set
+
+    // todo shouldn't take it as a state -> UIInput
     var onSelectedIndex by mutableStateOf<T?>(null)
         private set
 
+    // todo !! try to create event handle in Composable -> refer ViewModel#EventHandler
+    // then also could get rid of LaunchEffect
+    // 1. create uiEvent in ViewModel -> also explain MAD's EventHandler
+    // 2. create uiEvent in Composable
+    // do a comparison
     fun onIndexClicked(index: T) {
         onSelectedIndex = index
     }

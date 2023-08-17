@@ -1,10 +1,11 @@
-package com.bing.epubViewerSample.ui.skyEpub
+package com.bing.epubViewerSample.ui.viewer.androidView
 
 import android.content.Context
 import android.widget.Toast
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.bing.epubViewerSample.ui.common.viewer.ViewerIndexData
+import com.bing.epubViewerSample.ui.viewer.BookViewerContract
 import com.skytree.epub.ClickListener
 import com.skytree.epub.FixedControl
 import com.skytree.epub.NavPoint
@@ -18,8 +19,8 @@ import com.skytree.epub.State
  * custom viewer extending SkyEpub SDK#FixedControl
  * todo WIP
  */
-class SkyEpubFixedControl(context: Context, bookCodeValue: Int) : FixedControl(context),
-    SkyEpubControlInterface {
+class BookViewerFixed(context: Context, bookCodeValue: Int) : FixedControl(context),
+    BookViewerInterface {
 
     init {
         setBackgroundColor(Color.Gray.toArgb())
@@ -39,13 +40,13 @@ class SkyEpubFixedControl(context: Context, bookCodeValue: Int) : FixedControl(c
         }
     }
 
-    override fun setOnPageMovedListener(listener: (SkyEpubViewerContract.BookPagingInfo) -> Unit) {
+    override fun setOnPageMovedListener(listener: (BookViewerContract.BookPagingInfo) -> Unit) {
         setPageMovedListener(object : PageMovedListener {
 
             override fun onPageMoved(pi: PageInformation?) {
                 // be notice [totalPage] is changed during pagination
                 listener.invoke(
-                    SkyEpubViewerContract.BookPagingInfo(
+                    BookViewerContract.BookPagingInfo(
                         totalPageInChapter = pi?.numberOfPagesInChapter ?: 0,
                         currentIndexInChapter = pi?.pageIndex ?: 0,
                         currentIndexInBook = pi?.pageIndexInBook ?: 0,

@@ -1,4 +1,4 @@
-package com.bing.epubViewerSample.ui.skyEpub
+package com.bing.epubViewerSample.ui.viewer
 
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.ViewModel
@@ -8,11 +8,11 @@ import com.bing.epubViewerSample.epubDomain.EpubFileReader
 import com.bing.epubViewerSample.model.EpubInfo
 import com.bing.epubViewerSample.repository.EpubInfoRepository
 import com.bing.epubViewerSample.ui.common.UIEventHandler
-import com.bing.epubViewerSample.ui.skyEpub.SkyEpubViewerContract.MutableUiData
-import com.bing.epubViewerSample.ui.skyEpub.SkyEpubViewerContract.SkyEpubViewerEvent
-import com.bing.epubViewerSample.ui.skyEpub.SkyEpubViewerContract.UiData
-import com.bing.epubViewerSample.ui.skyEpub.SkyEpubViewerContract.UiInput
-import com.bing.epubViewerSample.ui.skyEpub.SkyEpubViewerContract.UiState
+import com.bing.epubViewerSample.ui.viewer.BookViewerContract.MutableUiData
+import com.bing.epubViewerSample.ui.viewer.BookViewerContract.SkyEpubViewerEvent
+import com.bing.epubViewerSample.ui.viewer.BookViewerContract.UiData
+import com.bing.epubViewerSample.ui.viewer.BookViewerContract.UiInput
+import com.bing.epubViewerSample.ui.viewer.BookViewerContract.UiState
 import com.skytree.epub.SkyProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -23,11 +23,11 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
-class SkyEpubViewerViewModel @Inject constructor(
+class BookViewerViewModel @Inject constructor(
     private val epubFileHandler: EpubFileHandler,
     private val dataRepository: EpubInfoRepository,
     private val epubFileReaderFactory: EpubFileReader.Factory,
-) : ViewModel(), SkyEpubViewerContract.ViewModel {
+) : ViewModel(), BookViewerContract.ViewModel {
 
     private val eventHandler = UIEventHandler<SkyEpubViewerEvent>(viewModelScope)
     private val _uiData = MutableUiData()
@@ -119,14 +119,14 @@ class SkyEpubViewerViewModel @Inject constructor(
         }.launchIn(viewModelScope)
 
         _onClickFontSizeSmaller.onEach {
-            setFontSize(_uiData.fontSizeIndex - 1)
+            updateFontSizeAndSaveInDB(_uiData.fontSizeIndex - 1)
         }.launchIn(viewModelScope)
         _onClickFontSizeBigger.onEach {
-            setFontSize(_uiData.fontSizeIndex + 1)
+            updateFontSizeAndSaveInDB(_uiData.fontSizeIndex + 1)
         }.launchIn(viewModelScope)
     }
 
-    private fun setFontSize(fontSizeIndexToChange: Int) {
+    private fun updateFontSizeAndSaveInDB(fontSizeIndexToChange: Int) {
         var rs = when (fontSizeIndexToChange) {
             -5 -> {
                 eventHandler.scheduleEvent(SkyEpubViewerEvent.ShowToast("Already the smallest font size"))
@@ -153,6 +153,7 @@ class SkyEpubViewerViewModel @Inject constructor(
             _uiData.fontSizeIndex = fontSizeIndexToChange
             _uiData.realFontSize = rs
         }
-        Timber.v("epub log setFontSize: ${_uiData.realFontSize}, ${_uiData.fontSizeIndex}")
+
+        // todo save the updated font size in db
     }
 }

@@ -1,4 +1,4 @@
-package com.bing.epubViewerSample.ui.skyEpub
+package com.bing.epubViewerSample.ui.viewer
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
@@ -10,7 +10,7 @@ import com.bing.epubViewerSample.ui.common.UIEvent
 import com.skytree.epub.SkyProvider
 import kotlinx.coroutines.flow.FlowCollector
 
-class SkyEpubViewerContract {
+class BookViewerContract {
 
     @Stable
     interface ViewModel : DefaultLifecycleObserver {

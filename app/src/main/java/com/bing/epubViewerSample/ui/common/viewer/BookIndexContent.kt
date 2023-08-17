@@ -17,10 +17,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.bing.epubViewerSample.ui.skyEpub.BookIndexState
-import com.bing.epubViewerSample.ui.skyEpub.rememberBookIndexState
 import com.bing.epubViewerSample.ui.theme.Paddings
 import com.bing.epubViewerSample.ui.theme.epubViewerSampleTheme
+import com.bing.epubViewerSample.ui.viewer.BookIndexState
+import com.bing.epubViewerSample.ui.viewer.rememberBookIndexState
 
 @Composable
 internal fun <T> EpubViewerBookIndexContent(

@@ -24,10 +24,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.bing.epubViewerSample.R
 import com.bing.epubViewerSample.model.FontSize
-import com.bing.epubViewerSample.ui.skyEpub.SeekBarState
-import com.bing.epubViewerSample.ui.skyEpub.rememberSeekBarState
 import com.bing.epubViewerSample.ui.theme.Paddings
 import com.bing.epubViewerSample.ui.theme.epubViewerSampleTheme
+import com.bing.epubViewerSample.ui.viewer.SeekBarState
+import com.bing.epubViewerSample.ui.viewer.rememberSeekBarState
 
 /**
  * @param onChangeSeekbarProgressFinish 0f ~ 1f
