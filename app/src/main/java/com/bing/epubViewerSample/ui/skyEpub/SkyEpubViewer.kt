@@ -80,7 +80,6 @@ internal fun SkyEpubViewer(
                 // init
                 setBookPath(uiData.bookPath)
                 setContentProvider(uiData.bookProvider)
-                // todo seems have bug to setStartPositionInBook,
                 setStartPositionInBook(uiData.initialPositionInBook)
 
                 // setListener, must call this to get totalPages by analysis global pagingInfo
@@ -106,7 +105,7 @@ internal fun SkyEpubViewer(
                     currentOnPageChanged.invoke(info)
                 }
                 setOnScreenClicked {
-                    currentUiState.setShowTopContent(true)
+                    currentUiState.updateShowTopContent(true)
                 }
 
             }

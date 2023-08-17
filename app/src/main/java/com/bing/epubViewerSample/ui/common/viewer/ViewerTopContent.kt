@@ -24,7 +24,7 @@ fun <T> ViewerTopContent(
             onClick = onClick,
             onCloseClick = onCloseClick,
             onIndexClick = {
-                skyEpubViewerUiState.setTocVisible(true)
+                skyEpubViewerUiState.updateTocVisible(true)
             },
             onFontSizeSelected = onFontSizeSelected
         )
@@ -33,7 +33,7 @@ fun <T> ViewerTopContent(
             modifier = Modifier.fillMaxSize(),
             isVisible = skyEpubViewerUiState.isTOCVisible,
             title = stringResource(R.string.table_of_content),
-            onHide = { skyEpubViewerUiState.setTocVisible(false) },
+            onHide = { skyEpubViewerUiState.updateTocVisible(false) },
             content = {
                 EpubViewerBookIndexContent(
                     bookIndexState = skyEpubViewerUiState.bookIndexState,

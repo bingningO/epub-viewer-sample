@@ -83,13 +83,6 @@ class SkyEpubReflowableControl(context: Context, bookCode: Int, fontSize: Int) :
 
             override fun onPageMoved(pi: PageInformation?) {
                 // be notice [totalPage] is changed during pagination
-                Timber.v(
-                    "epub log onPageMoved: pageIndexInBook: ${pi?.pageIndexInBook}, pagePositionInBook: ${pi?.pagePositionInBook}, numberOfPagesInBook: ${pi?.numberOfPagesInBook}, numberOfPagesInChapter: ${pi?.numberOfPagesInChapter}, pageIndex: ${pi?.pageIndex}, chapterIndex: ${pi?.chapterIndex}, numberOfChaptersInBook: ${pi?.numberOfChaptersInBook}, cgpi: ${
-                        getPageIndexInBookByPagePositionInBook(
-                            pi?.pagePositionInBook ?: 0.0
-                        )
-                    }"
-                )
                 if (isPaging.not() && pi != null && pi.numberOfPagesInBook != 0) {
                     listener.invoke(
                         SkyEpubViewerContract.BookPagingInfo(

@@ -120,7 +120,7 @@ private fun SkyEpubViewerSuccessContent(
     ) {
         ViewerTopContent(
             onClick = {
-                skyEpubViewerUiState.setShowTopContent(false)
+                skyEpubViewerUiState.updateShowTopContent(false)
             },
             onCloseClick = onCloseClick,
             skyEpubViewerUiState = skyEpubViewerUiState,

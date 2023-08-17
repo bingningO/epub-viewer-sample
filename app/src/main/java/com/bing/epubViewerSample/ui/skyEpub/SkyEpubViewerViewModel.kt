@@ -50,7 +50,7 @@ class SkyEpubViewerViewModel @Inject constructor(
     }
 
     // change the book name here to open different book file(also they need to be copied to assets dir)
-    private val bookName = "Alice.epub"
+    private val bookName = "aquarium.epub"
 //    private val bookName = "page-blanche-fixed.epub"
 
     private val bookFileCode = 1

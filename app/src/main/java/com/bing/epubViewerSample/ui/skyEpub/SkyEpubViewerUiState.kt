@@ -24,11 +24,11 @@ class SkyEpubViewerUiState<T>(
         isTOCVisible = false
     }
 
-    fun setTocVisible(visible: Boolean) {
+    fun updateTocVisible(visible: Boolean) {
         isTOCVisible = visible
     }
 
-    fun setShowTopContent(visible: Boolean) {
+    fun updateShowTopContent(visible: Boolean) {
         isShowTopContent = visible
     }
 }
