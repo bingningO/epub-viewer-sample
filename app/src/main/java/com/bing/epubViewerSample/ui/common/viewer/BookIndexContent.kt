@@ -24,7 +24,7 @@ import com.bing.epubViewerSample.ui.viewer.BookViewerContract.ViewerIndexData
 internal fun <T> EpubViewerBookIndexContent(
     modifier: Modifier = Modifier,
     indexList: List<ViewerIndexData<T>>,
-    onIndexClicked: (T) -> Unit,
+    onIndexClick: (T) -> Unit,
 ) {
     LazyColumn(
         modifier = modifier.fillMaxWidth(),
@@ -47,7 +47,7 @@ internal fun <T> EpubViewerBookIndexContent(
             Text(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { onIndexClicked(indexData.pageData) }
+                    .clickable { onIndexClick(indexData.pageData) }
                     .padding(horizontal = 20.dp, vertical = Paddings.x075),
                 text = displayTitle,
                 style = MaterialTheme.typography.bodyMedium,
@@ -75,7 +75,7 @@ private fun EpubViewerBookIndexContentPreview() {
     epubViewerSampleTheme() {
         EpubViewerBookIndexContent<String>(
             indexList = dummyList,
-            onIndexClicked = { }
+            onIndexClick = { }
         )
     }
 }

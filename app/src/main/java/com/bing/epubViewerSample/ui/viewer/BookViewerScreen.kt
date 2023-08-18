@@ -23,7 +23,6 @@ import com.bing.epubViewerSample.ui.common.composable.LoadingScreen
 import com.bing.epubViewerSample.ui.common.viewer.ViewerTopContent
 import com.bing.epubViewerSample.ui.viewer.BookViewerContract.*
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @Composable
 fun BookViewerScreen(
@@ -36,7 +35,6 @@ fun BookViewerScreen(
 
     uiState.events.firstOrNull()?.let { event ->
         LaunchedEffect(event.id) {
-            Timber.v("epub log event: $event")
             when (event) {
                 is SkyEpubViewerEvent.ShowToast -> {
                     Toast.makeText(context, event.message, Toast.LENGTH_LONG).show()

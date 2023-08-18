@@ -27,7 +27,7 @@ internal fun SkyEpubViewer(
     onLoadingStateChange: (Boolean) -> Unit,
     onPageChange: (BookPagingInfo) -> Unit,
     onIndexDataLoad: (List<NavPoint>) -> Unit,
-    bookViewerState: BookViewerState<NavPoint>,
+    bookViewerState: BookViewerState,
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
     var viewerRef by remember {
@@ -38,7 +38,7 @@ internal fun SkyEpubViewer(
     // always read the updated value if called inside AndroidView#factory
     val currentOnLoadingStateChange by rememberUpdatedState(onLoadingStateChange)
     val currentOnPageChanged by rememberUpdatedState(newValue = onPageChange)
-    val currentUiState by rememberUpdatedState(newValue = bookViewerState)
+    val currentBookViewerState by rememberUpdatedState(newValue = bookViewerState)
     val currentOnIndexDataLoad by rememberUpdatedState(newValue = onIndexDataLoad)
 
     DisposableEffect(lifecycleOwner) {
@@ -67,8 +67,28 @@ internal fun SkyEpubViewer(
         }
     }
 
-    LaunchedEffect(uiData.realFontSize) {
-        viewerRef.get()?.setFontSizeIfNotLoading(uiData.realFontSize)
+    bookViewerState.events.firstOrNull()?.let { event ->
+        LaunchedEffect(event.id) {
+            when (event) {
+                is BookViewerEvent.JumpToIndex<*> -> {
+                    if (viewerRef.get()?.isPaging?.not() == true) {
+                        viewerRef.get()?.gotoPageByNavPoint(event.index as NavPoint)
+                    }
+                }
+
+                is BookViewerEvent.JumpToPage -> {
+                    if (viewerRef.get()?.isPaging?.not() == true) {
+                        viewerRef.get()?.getPagePositionInBookByPageIndexInBook(event.page)
+                            ?.let { ppb ->
+                                // So absolute position in epub is expressed as pagePositionInBook.
+                                // This is float value from 0.0f to 1.0f for entire book.
+                                viewerRef.get()?.gotoPageByPagePositionInBook(ppb)
+                            }
+                    }
+                }
+            }
+            bookViewerState.onEventConsume.emit(event)
+        }
     }
 
     AndroidView(
@@ -88,7 +108,7 @@ internal fun SkyEpubViewer(
                 // setListener, must call this to get totalPages by analysis global pagingInfo
                 setScanListener(
                     scanFinishedListener = { max, currentIndex ->
-                        currentUiState.onPageInfoChanged(
+                        currentBookViewerState.onPageInfoChanged(
                             currentIndex = currentIndex,
                             totalPage = max
                         )
@@ -112,28 +132,16 @@ internal fun SkyEpubViewer(
                     currentOnPageChanged.invoke(info)
                 }
                 setOnScreenClicked {
-                    currentUiState.updateShowTopContent(true)
+                    currentBookViewerState.updateShowTopContent(true)
                 }
 
             }
         },
         update = { view ->
             Timber.v("epub log viewer update")
-            bookViewerState.seekBarState.onProgressChangeRequest?.let {
-                if (view.isPaging.not()) {
-                    val ppb = view.getPagePositionInBookByPageIndexInBook(it)
-                    // So absolute position in epub is expressed as pagePositionInBook.
-                    // This is float value from 0.0f to 1.0f for entire book.
-                    view.gotoPageByPagePositionInBook(ppb)
-
-                    bookViewerState.seekBarState.onProgressChangeRequestConsumed()
-                }
-            }
-            bookViewerState.bookIndexState.onSelectedIndex?.let {
-                if (view.isPaging.not()) {
-                    view.gotoPageByNavPoint(it)
-                    bookViewerState.bookIndexState.onIndexJumpConsumed()
-                }
+            // update{} will be called directly after factory{}, skip the first call for better performance
+            if (isInitLoading.not()) {
+                view.setFontSizeIfNotLoading(uiData.realFontSize)
             }
         },
     )

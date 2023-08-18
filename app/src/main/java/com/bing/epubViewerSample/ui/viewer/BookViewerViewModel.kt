@@ -37,7 +37,7 @@ class BookViewerViewModel @Inject constructor(
         override val events: List<SkyEpubViewerEvent> by eventHandler.eventState
     }
 
-    private val _onLoadingStateChanged = MutableSharedFlow<Boolean>()
+    private val _onLoadingStateChange = MutableSharedFlow<Boolean>()
     private val _onChangePagePosition = MutableSharedFlow<Double>()
     private val _onClickFontSizeBigger = MutableSharedFlow<Unit>()
     private val _onClickFontSizeSmaller = MutableSharedFlow<Unit>()
@@ -45,7 +45,7 @@ class BookViewerViewModel @Inject constructor(
 
     override val uiInput: UiInput = object : UiInput {
         override val onEventConsume = eventHandler.onEventConsumed
-        override val onLoadingStateChange = _onLoadingStateChanged
+        override val onLoadingStateChange = _onLoadingStateChange
         override val onChangePagePosition = _onChangePagePosition
         override val onClickFontSizeBigger = _onClickFontSizeBigger
         override val onClickFontSizeSmaller = _onClickFontSizeSmaller
@@ -105,7 +105,7 @@ class BookViewerViewModel @Inject constructor(
     }
 
     private fun startObserveUiInput() {
-        _onLoadingStateChanged.onEach { isLoading ->
+        _onLoadingStateChange.onEach { isLoading ->
             _uiData.isLoading = isLoading || isPreparingData
         }.launchIn(viewModelScope)
 

@@ -57,6 +57,7 @@ class BookViewerReflowable(context: Context, bookCode: Int, fontSize: Int) :
     }
 
     fun setFontSizeIfNotLoading(realFontSize: Int) {
+        Timber.v("epub log setFontSizeIfNotLoading: $currentState, $realFontSize")
         if (currentState != State.NORMAL) return
         changeFont(FONT_SIZE_NAME, realFontSize)
     }

@@ -21,7 +21,7 @@ fun <T> ViewerTopContent(
     onClick: () -> Unit,
     onCloseClick: () -> Unit,
     onFontSizeSelected: (FontSize) -> Unit,
-    bookViewerState: BookViewerState<T>,
+    bookViewerState: BookViewerState,
     indexList: List<ViewerIndexData<T>>,
 ) {
     Box(modifier = modifier.fillMaxSize()) {
@@ -35,7 +35,7 @@ fun <T> ViewerTopContent(
             currentIndex = bookViewerState.currentIndex,
             totalPage = bookViewerState.totalPage,
             onChangeSeekbarProgressFinish = {
-                bookViewerState.seekBarState.onProgressChangeRequest(it)
+                bookViewerState.onSeekBarProgressChangeFinish(it)
             },
         )
 
@@ -47,8 +47,8 @@ fun <T> ViewerTopContent(
             content = {
                 EpubViewerBookIndexContent(
                     indexList = indexList,
-                    onIndexClicked = {
-                        bookViewerState.onBookIndexClicked(it)
+                    onIndexClick = {
+                        bookViewerState.onBookIndexClick(it)
                     }
                 )
             },
