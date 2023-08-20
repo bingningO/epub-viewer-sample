@@ -32,8 +32,8 @@ fun <T> ViewerTopContent(
                 bookViewerState.updateTocVisible(true)
             },
             onFontSizeSelected = onFontSizeSelected,
-            currentIndex = bookViewerState.currentIndex,
-            totalPage = bookViewerState.totalPage,
+            currentIndex = bookViewerState.stateData.currentIndex,
+            totalPage = bookViewerState.stateData.totalPage,
             onChangeSeekbarProgressFinish = {
                 bookViewerState.onSeekBarProgressChangeFinish(it)
             },
@@ -41,7 +41,7 @@ fun <T> ViewerTopContent(
 
         SlidePanelWithTranslucentBackground(
             modifier = Modifier.fillMaxSize(),
-            isVisible = bookViewerState.isTOCVisible,
+            isVisible = bookViewerState.stateData.isTOCVisible,
             title = stringResource(R.string.table_of_content),
             onHide = { bookViewerState.updateTocVisible(false) },
             content = {

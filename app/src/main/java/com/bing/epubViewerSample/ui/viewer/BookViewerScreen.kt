@@ -76,7 +76,7 @@ private fun BookViewerSuccessContent(
     onCloseClick: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    val bookViewerState = rememberBookViewerState()
+    val bookViewerState = rememberSaveableBookViewerState()
 
     CompositionLocalProvider(
         LocalOverscrollConfiguration provides null,
@@ -99,7 +99,7 @@ private fun BookViewerSuccessContent(
     }
 
     AnimatedVisibility(
-        visible = bookViewerState.isShowTopContent,
+        visible = bookViewerState.stateData.isShowTopContent,
         enter = fadeIn(),
         exit = fadeOut()
     ) {
