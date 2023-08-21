@@ -22,6 +22,7 @@ import com.bing.epubViewerSample.ui.common.composable.ErrorScreen
 import com.bing.epubViewerSample.ui.common.composable.LoadingScreen
 import com.bing.epubViewerSample.ui.common.viewer.ViewerTopContent
 import com.bing.epubViewerSample.ui.viewer.BookViewerContract.*
+import com.bing.epubViewerSample.ui.viewer.simpleOne.SimpleBookViewerSuccessScreen
 import kotlinx.coroutines.launch
 
 @Composable
@@ -54,7 +55,7 @@ fun BookViewerScreen(
                     modifier = Modifier.fillMaxSize()
                 ) {
                     if (uiData.bookProvider != null) {
-                        BookViewerSuccessContent(
+                        SimpleBookViewerSuccessScreen(
                             uiData = uiData, uiInput = uiInput, onCloseClick = onCloseClick
                         )
                     }
