@@ -3,6 +3,7 @@
 ## Simple Introduction
 
 A sample project for epub-viewer.
+
 The SDK used in this project, [SkyEpub](https://skyepub.net/documents/), non-commercial use only.
 
 ![](https://github.com/bingningO/epub-viewer-sample/blob/main/app/src/main/assets/photos/screenshot.gif)
